@@ -23,7 +23,7 @@ const swaggerOptions = {
     description: 'Documentation interactive de l\'API Atlas',
   },
   baseDir: __dirname,
-  filesPattern: './**/*.ts',
+  filesPattern: './**/*.{ts,js}',
   swaggerUIPath: '/api-docs',
   exposeSwaggerUI: true,
 };
