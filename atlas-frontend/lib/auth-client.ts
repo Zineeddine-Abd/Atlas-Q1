@@ -5,7 +5,7 @@
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL: "http://localhost:3001",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
   fetchOptions: {
     credentials: "include", // pour que les cookies peuvent passer 
   }

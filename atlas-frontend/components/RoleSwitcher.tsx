@@ -21,8 +21,7 @@ export function RoleSwitcher() {
   // ── Guard before any user access ────────────────────────────────────────────
   if (!user) return null;
 
-  const isVendor = user.role === 'VENDEUR';
-
+  const isVendor = user.role === 'VENDEUR' || user.role === 'seller';
   const handleSwitchToClient = () => {
     switchRole('CLIENT');
     router.push('/');
@@ -33,7 +32,6 @@ export function RoleSwitcher() {
     router.push('/dashboard');   // (vendor) route group → real URL is /dashboard
   };
 
-  const isVendor = user.role === 'VENDEUR' || user.role === 'seller';
 
   const handleLogout = () => {
     logout();
