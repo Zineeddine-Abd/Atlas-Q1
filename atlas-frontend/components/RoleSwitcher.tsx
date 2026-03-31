@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, Store, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,23 +15,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export function RoleSwitcher() {
-  const { user, switchRole, logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
 
   // ── Guard before any user access ────────────────────────────────────────────
   if (!user) return null;
 
   const isVendor = user.role === 'VENDEUR' || user.role === 'seller';
-  const handleSwitchToClient = () => {
-    switchRole('CLIENT');
-    router.push('/');
-  };
-
-  const handleSwitchToVendeur = () => {
-    switchRole('VENDEUR');
-    router.push('/dashboard');   // (vendor) route group → real URL is /dashboard
-  };
-
+  
 
   const handleLogout = () => {
     logout();
@@ -47,7 +38,7 @@ export function RoleSwitcher() {
           className="fixed bottom-[20px] right-[20px] z-[9999] gap-2 bg-[#4F46E5] text-white border-[#4F46E5] hover:bg-[#4338ca] hover:text-white"
         >
           <RefreshCw className="h-4 w-4" />
-          <span className="hidden sm:inline">Tester les rôles</span>
+          <span className="hidden sm:inline">Afficher mon rôle</span>
         </Button>
       </DropdownMenuTrigger>
 
@@ -69,24 +60,6 @@ export function RoleSwitcher() {
             <div className="text-xs text-muted-foreground mt-1">{user.name}</div>
           )}
         </DropdownMenuLabel>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem
-          onClick={handleSwitchToClient}
-          disabled={user.role === 'CLIENT'}
-        >
-          <User className="mr-2 h-4 w-4" />
-          <span>Basculer en Acheteur</span>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          onClick={handleSwitchToVendeur}
-          disabled={user.role === 'VENDEUR'}
-        >
-          <Store className="mr-2 h-4 w-4" />
-          <span>Basculer en Vendeur</span>
-        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
