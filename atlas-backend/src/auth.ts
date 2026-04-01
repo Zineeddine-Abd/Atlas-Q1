@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { Kysely, PostgresDialect } from "kysely";
 import pkg from "pg";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import dotenv from "dotenv";
 
 const { Pool } = pkg;
@@ -17,14 +17,7 @@ const db = new Kysely({
   dialect: new PostgresDialect({ pool: dbPool }),
 });
 
-const mailer = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 587,
-  auth: {
-    user: process.env.MAILTRAP_USER,
-    pass: process.env.MAILTRAP_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
   database: {
@@ -34,6 +27,13 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
   trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:3000"],
+  // Forcer les cookies à accepter le cross-domain (Vercel <-> Render)
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
@@ -42,23 +42,28 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      await mailer.sendMail({
-        from: '"Atlas" <no-reply@atlas.dev>',
-        to: user.email,
-        subject: "Vérifiez votre adresse email — Atlas",
-        html: `
-          <div style="font-family: sans-serif; max-width: 480px; margin: auto; padding: 32px;">
-            <h2 style="color: #0D1B3E;">Bienvenue sur Atlas 👋</h2>
-            <p style="color: #444;">Cliquez sur le bouton ci-dessous pour vérifier votre adresse email et accéder à votre compte.</p>
-            <a href="${url}" style="display:inline-block; margin-top: 16px; padding: 12px 24px; background:#4F46E5; color:white; border-radius:8px; text-decoration:none; font-weight:bold;">
-              Vérifier mon email
-            </a>
-            <p style="color:#999; font-size:12px; margin-top:32px;">
-              Si vous n'avez pas créé de compte sur Atlas, ignorez cet email.
-            </p>
-          </div>
-        `,
-      });
+      try {
+        await resend.emails.send({
+          from: "Atlas <onboarding@resend.dev>", // Utilise un domaine de test par défaut ou le vôtre
+          to: user.email,
+          subject: "Vérifiez votre adresse email — Atlas",
+          html: `
+            <div style="font-family: sans-serif; max-width: 480px; margin: auto; padding: 32px;">
+              <h2 style="color: #0D1B3E;">Bienvenue sur Atlas 👋</h2>
+              <p style="color: #444;">Cliquez sur le bouton ci-dessous pour vérifier votre adresse email et accéder à votre compte.</p>
+              <a href="${url}" style="display:inline-block; margin-top: 16px; padding: 12px 24px; background:#4F46E5; color:white; border-radius:8px; text-decoration:none; font-weight:bold;">
+                Vérifier mon email
+              </a>
+              <p style="color:#999; font-size:12px; margin-top:32px;">
+                Si vous n'avez pas créé de compte sur Atlas, ignorez cet email.
+              </p>
+            </div>
+          `,
+        });
+        console.log("Email de vérification envoyé avec succès à", user.email);
+      } catch (error) {
+        console.error("Erreur d'envoi d'email avec Resend:", error);
+      }
     },
   },
   user: {

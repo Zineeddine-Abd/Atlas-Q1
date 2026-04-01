@@ -22,7 +22,8 @@
     "express-jsdoc-swagger": "^1.8.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^8.0.4",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "resend": "^6.10.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
