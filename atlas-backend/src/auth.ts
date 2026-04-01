@@ -50,7 +50,7 @@ export const auth = betterAuth({
 
       try {
         const targetEmail = process.env.SANDBOX_EMAIL || user.email;
-        
+
         const response = await resend.emails.send({
           from: "Atlas <onboarding@resend.dev>",
           to: targetEmail,
@@ -70,12 +70,12 @@ export const auth = betterAuth({
         });
 
         if (response.error) {
-          console.error("❌ Resend a refusé d'envoyer l'email :", response.error.message);
+          console.error("Resend a refusé d'envoyer l'email :", response.error.message);
         } else {
-          console.log("✅ Email de vérification envoyé avec succès à", user.email);
+          console.log("Email de vérification envoyé avec succès à", user.email);
         }
       } catch (error) {
-        console.error("❌ Erreur d'envoi d'email avec Resend:", error);
+        console.error("Erreur d'envoi d'email avec Resend:", error);
       }
     },
   },
