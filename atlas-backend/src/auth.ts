@@ -42,11 +42,19 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
+      // Dépannage facile (sans attendre l'email), on affiche le lien dans les logs Render
+      console.log("=========================================");
+      console.log("🔗 LIEN DE VÉRIFICATION GÉNÉRÉ :");
+      console.log(url);
+      console.log("=========================================");
+
       try {
-        await resend.emails.send({
-          from: "Atlas <onboarding@resend.dev>", // Utilise un domaine de test par défaut ou le vôtre
-          to: user.email,
-          subject: "Vérifiez votre adresse email — Atlas",
+        const targetEmail = process.env.SANDBOX_EMAIL || user.email;
+        
+        const response = await resend.emails.send({
+          from: "Atlas <onboarding@resend.dev>",
+          to: targetEmail,
+          subject: `Vérifiez votre adresse email (${user.email}) — Atlas`,
           html: `
             <div style="font-family: sans-serif; max-width: 480px; margin: auto; padding: 32px;">
               <h2 style="color: #0D1B3E;">Bienvenue sur Atlas 👋</h2>
@@ -60,9 +68,14 @@ export const auth = betterAuth({
             </div>
           `,
         });
-        console.log("Email de vérification envoyé avec succès à", user.email);
+
+        if (response.error) {
+          console.error("❌ Resend a refusé d'envoyer l'email :", response.error.message);
+        } else {
+          console.log("✅ Email de vérification envoyé avec succès à", user.email);
+        }
       } catch (error) {
-        console.error("Erreur d'envoi d'email avec Resend:", error);
+        console.error("❌ Erreur d'envoi d'email avec Resend:", error);
       }
     },
   },
