@@ -92,7 +92,11 @@ export async function removeFromCart(itemId: number) {
     method: 'DELETE',
     credentials: 'include',
   });
-  return res.json();
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Erreur lors de la suppression");
+  }
+  return data;
 }
 
 // ─── Categories ───────────────────────────────────────────────────────────────

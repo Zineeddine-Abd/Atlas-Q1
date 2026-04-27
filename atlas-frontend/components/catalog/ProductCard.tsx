@@ -80,6 +80,11 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
     e.stopPropagation();
     if (status === "loading" || status === "added") return;
 
+    if (product.variantes && product.variantes.length > 1) {
+      router.push(`/products/${product.id}`);
+      return;
+    }
+
     const targetVarianteId =
       product.variantes && product.variantes.length > 0
         ? product.variantes[0].id
