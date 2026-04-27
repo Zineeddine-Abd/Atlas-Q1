@@ -1,5 +1,17 @@
 import Link from "next/link";
 import { SiFacebook, SiX, SiInstagram } from "@icons-pack/react-simple-icons";
+
+/**
+ * Pied de page global de l'application, présent sur toutes les pages.
+ *
+ * Affiche quatre colonnes :
+ * - **À propos** : description courte de la plateforme.
+ * - **Navigation** : liens principaux (Catalogue, Devenir vendeur, À propos, Contact).
+ * - **Légal** : CGU, politique de confidentialité, mentions légales.
+ * - **Réseaux sociaux** : icônes Facebook, Twitter (X) et Instagram.
+ *
+ * @returns Le pied de page complet avec copyright.
+ */
 export function Footer() {
   return (
     <footer className="border-t border-border bg-white mt-auto">

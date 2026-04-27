@@ -1,3 +1,7 @@
+/**
+ * @file components/ui/Textarea.tsx
+ * @description Zone de texte multiligne stylisée, redimensionnable verticalement.
+ */
 import { TextareaHTMLAttributes } from "react";
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {}

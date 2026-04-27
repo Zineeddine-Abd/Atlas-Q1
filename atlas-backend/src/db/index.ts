@@ -1,28 +1,29 @@
-// On importe la bibliothèque PostgreSQL pour Node.js
+/**
+ * @file db/index.ts
+ * @description Configuration et export du pool de connexions PostgreSQL.
+ * Utilise la variable d'environnement `DATABASE_URL` pour la chaîne de connexion.
+ * SSL activé avec `rejectUnauthorized: false` (compatible Supabase/Neon).
+ * En cas d'erreur inattendue sur le pool, le processus est arrêté (exit -1).
+ */
 import pg from "pg";
-
-// On importe dotenv pour charger les variables d'environnement depuis le fichier .env
 import dotenv from "dotenv";
 
-// On exécute dotenv pour que process.env contienne les variables du fichier .env
 dotenv.config();
 
-// On récupère l'objet Pool depuis pg, qui sert à gérer un groupe de connexions à la base
 const { Pool } = pg;
 
-// On crée un nouveau pool de connexions à la base PostgreSQL
+/**
+ * Pool de connexions PostgreSQL partagé par tous les services et controllers.
+ * Configuré via `process.env.DATABASE_URL`.
+ */
 export const pool = new Pool({
-  // URL de connexion à la base, définie dans les variables d'environnement
   connectionString: process.env.DATABASE_URL,
-  // Configuration SSL
   ssl: {
     rejectUnauthorized: false,
   },
 });
 
-// Gestion des erreurs inattendues sur le pool
 pool.on("error", (err) => {
   console.error("Erreur inattendue sur le pool PostgreSQL :", err);
-  // On arrête le serveur Node.js 
   process.exit(-1);
-})
+});

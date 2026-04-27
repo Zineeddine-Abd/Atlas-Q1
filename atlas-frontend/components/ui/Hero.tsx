@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from "react";
+/**
+ * @file components/ui/Hero.tsx
+ * @description Section hero de la page d'accueil.
+ * Charge les 3 premiers produits du catalogue pour les afficher en cartes flottantes animées.
+ * Intègre une barre de recherche qui redirige vers /catalogue avec le terme en query param.
+ */
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import Productcard from "@/components/ui/Productcard";
+import { useRouter } from "next/navigation";
+import HeroProductcard from "@/components/ui/HeroProductcard";
 
 const tags = [
   { icon: "✦", label: "1000+ produits" },
@@ -12,86 +19,73 @@ const tags = [
 
 const categoryTabs = ["Tout", "Mode", "Maison", "Tech"];
 
-const products = [
-  {
-    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=300&q=80",
-    nom: "Sac en cuir artisanal",
-    prix: 89.99,
-    boutique: "la BoutiqueNoire",
-    note: 5,
-  },
-  {
-    image: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=300&q=80",
-    nom: "Lampe design scandinave",
-    prix: 149.99,
-    boutique: "la BoutiqueNoire",
-    note: 4,
-  },
-  {
-    image: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=80",
-    nom: "Veste denim premium",
-    prix: 67.00,
-    boutique: "la BoutiqueNoire",
-    note: 3,
-  },
-];
+interface Produit {
+  id: number;
+  nom: string;
+  prix: number;
+  images: string[];
+  boutique_nom: string;
+  note_moyenne?: number;
+}
 
+/**
+ * Composant hero pleine hauteur avec barre de recherche, tags et cartes produits animées.
+ * Sur mobile, les cartes sont affichées en défilement horizontal.
+ */
 export default function Hero() {
-  const [activeTab, setActiveTab] = useState("Tout");
+  const router = useRouter();
   const [query, setQuery] = useState("");
+  const [products, setProducts] = useState<Produit[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products?limite=3`)
+      .then((res) => res.json())
+      .then((data) => {
+        const produitsArray = data.produits || [];
+        setProducts(produitsArray.slice(0, 3));
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Erreur chargement produits hero :", err);
+        setLoading(false);
+      });
+  }, []);
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      router.push(`/catalogue?q=${encodeURIComponent(query.trim())}`);
+    } else {
+      router.push("/catalogue");
+    }
+  };
 
   return (
-    <section
-      style={{
-        minHeight: "100vh",
-        paddingTop: "60px",
-        position: "relative",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <section className="relative min-h-screen overflow-hidden flex flex-col pt-[60px]">
+      {/* Background glows */}
       <div className="hero-glow" style={{ left: "-100px", top: "100px" }} />
       <div
+        className="absolute w-64 h-64 md:w-96 md:h-96 rounded-full pointer-events-none"
         style={{
-          position: "absolute",
-          width: "400px",
-          height: "400px",
           background: "radial-gradient(circle, rgba(120,60,255,0.12) 0%, transparent 70%)",
-          borderRadius: "50%",
           right: "10%",
           bottom: "20%",
-          pointerEvents: "none",
         }}
       />
 
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          padding: "0 80px",
-          gap: "40px",
-          maxWidth: "1280px",
-          margin: "0 auto",
-          width: "100%",
-        }}
-      >
-        {/* Left */}
-        <div style={{ flex: 1, maxWidth: "600px" }}>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col lg:flex-row items-center gap-10 px-6 sm:px-10 lg:px-20 py-10 max-w-[1280px] mx-auto w-full">
+
+        {/* ── Left column ── */}
+        <div className="flex-1 w-full max-w-xl mx-auto lg:mx-0">
 
           <h1
-            className="animate-fade-up"
+            className="animate-fade-up font-extrabold leading-tight mb-5 text-white text-4xl sm:text-5xl lg:text-[52px]"
             style={{
               fontFamily: "Syne, sans-serif",
-              fontSize: "52px",
-              fontWeight: "800",
-              lineHeight: 1.15,
-              marginBottom: "20px",
               opacity: 0,
               animationDelay: "0s",
               animationFillMode: "forwards",
-              color: "white",
             }}
           >
             Le marché des{" "}
@@ -108,12 +102,10 @@ export default function Hero() {
           </h1>
 
           <p
-            className="animate-fade-up"
+            className="animate-fade-up text-base sm:text-lg mb-8"
             style={{
               fontFamily: "DM Sans, sans-serif",
               color: "rgba(255,255,255,0.75)",
-              fontSize: "18px",
-              marginBottom: "36px",
               opacity: 0,
               animationDelay: "0.1s",
               animationFillMode: "forwards",
@@ -124,26 +116,14 @@ export default function Hero() {
 
           {/* Search bar */}
           <div
-            className="animate-fade-up"
-            style={{
-              display: "flex",
-              gap: "10px",
-              marginBottom: "24px",
-              opacity: 0,
-              animationDelay: "0.2s",
-              animationFillMode: "forwards",
-            }}
+            className="animate-fade-up flex gap-2 mb-6"
+            style={{ opacity: 0, animationDelay: "0.2s", animationFillMode: "forwards" }}
           >
             <div
+              className="flex-1 flex items-center gap-3 rounded-2xl px-4"
               style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
                 background: "rgba(255,255,255,0.08)",
                 border: "1.5px solid rgba(255,255,255,0.2)",
-                borderRadius: "14px",
-                padding: "0 20px",
               }}
             >
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.5)" strokeWidth={2}>
@@ -153,157 +133,142 @@ export default function Hero() {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Rechercher un produit, un vendeur..."
-                style={{
-                  flex: 1,
-                  background: "none",
-                  border: "none",
-                  outline: "none",
-                  color: "white",
-                  fontSize: "16px",
-                  fontFamily: "DM Sans, sans-serif",
-                  padding: "18px 0",
-                }}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                placeholder="Rechercher un produit..."
+                className="flex-1 bg-transparent border-none outline-none text-white text-sm sm:text-base py-4"
+                style={{ fontFamily: "DM Sans, sans-serif" }}
               />
             </div>
             <button
-              className="btn-primary"
-              style={{
-                padding: "18px 28px",
-                borderRadius: "14px",
-                fontSize: "16px",
-                fontWeight: "600",
-                whiteSpace: "nowrap",
-              }}
+              onClick={handleSearch}
+              className="btn-primary rounded-2xl text-sm sm:text-base font-semibold whitespace-nowrap px-4 sm:px-7 py-4 cursor-pointer"
             >
-              Rechercher
+              <span className="hidden sm:inline">Rechercher</span>
+              <svg className="sm:hidden" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <circle cx="11" cy="11" r="8" />
+                <path strokeLinecap="round" d="m21 21-4.35-4.35" />
+              </svg>
             </button>
           </div>
 
           {/* Tags */}
           <div
-            className="animate-fade-up"
-            style={{
-              display: "flex",
-              gap: "10px",
-              flexWrap: "wrap",
-              marginBottom: "28px",
-              opacity: 0,
-              animationDelay: "0.3s",
-              animationFillMode: "forwards",
-            }}
+            className="animate-fade-up flex flex-wrap gap-2 mb-6"
+            style={{ opacity: 0, animationDelay: "0.3s", animationFillMode: "forwards" }}
           >
             {tags.map((t) => (
-              <span key={t.label} className="tag-pill" style={{ fontSize: "13px", padding: "7px 16px" }}>
+              <span key={t.label} className="tag-pill text-xs sm:text-sm px-3 sm:px-4 py-1.5">
                 <span style={{ color: "#3b6bff" }}>{t.icon}</span>
                 {t.label}
               </span>
             ))}
           </div>
 
-          {/* Category tabs */}
+          {/* Category tags */}
           <div
-            className="animate-fade-up"
-            style={{
-              display: "flex",
-              gap: "10px",
-              marginBottom: "36px",
-              opacity: 0,
-              animationDelay: "0.35s",
-              animationFillMode: "forwards",
-            }}
+            className="animate-fade-up flex flex-wrap gap-2 mb-8"
+            style={{ opacity: 0, animationDelay: "0.35s", animationFillMode: "forwards" }}
           >
             {categoryTabs.map((tab) => (
-              <button
+              <span
                 key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`category-tab ${activeTab === tab ? "active" : "inactive"}`}
-                style={{ fontSize: "14px", padding: "8px 20px" }}
+                className="text-sm px-4 sm:px-5 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/50 select-none cursor-default"
+                style={{ fontFamily: "DM Sans, sans-serif" }}
               >
                 {tab}
-              </button>
+              </span>
             ))}
           </div>
 
-          {/* CTA buttons */}
+          {/* CTA */}
           <div
             className="animate-fade-up"
-            style={{
-              display: "flex",
-              gap: "14px",
-              opacity: 0,
-              animationDelay: "0.4s",
-              animationFillMode: "forwards",
-            }}
+            style={{ opacity: 0, animationDelay: "0.4s", animationFillMode: "forwards" }}
           >
-            <Link href="/register">
+            <Link href="/catalogue">
               <button
-                className="btn-primary"
-                style={{
-                  padding: "16px 28px",
-                  borderRadius: "12px",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  cursor: "pointer",
-                }}
+                className="btn-primary flex items-center gap-2 px-6 sm:px-7 py-4 rounded-xl text-sm sm:text-base font-semibold cursor-pointer"
               >
-                Inscription
-              </button>
-            </Link>
-            <Link href="/login">
-              <button
-                className="btn-outline"
-                style={{
-                  padding: "16px 28px",
-                  borderRadius: "12px",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                }}
-              >
-                Connexion
+                Explorer le catalogue
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </Link>
           </div>
         </div>
 
-        {/* Right — floating cards */}
-        <div
-          style={{
-            flex: 1,
-            position: "relative",
-            height: "500px",
-            minWidth: "420px",
-          }}
-        >
-          <div className="animate-float" style={{ position: "absolute", left: "0px", top: "30px", zIndex: 2 }}>
-            <Productcard {...products[0]} />
-          </div>
-          <div className="animate-float-delay" style={{ position: "absolute", right: "0px", top: "0px", zIndex: 1 }}>
-            <Productcard {...products[1]} />
-          </div>
-          <div className="animate-float" style={{ position: "absolute", left: "110px", bottom: "20px", animationDelay: "0.8s", zIndex: 3 }}>
-            <Productcard {...products[2]} />
-          </div>
+        {/* ── Right column — floating cards ── */}
+        {/* Hidden on mobile, visible from lg up */}
+        <div className="hidden lg:block flex-1 relative h-[500px] min-w-[420px]">
+          {loading && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/40 text-sm"
+              style={{ fontFamily: "DM Sans, sans-serif" }}>
+              Chargement...
+            </div>
+          )}
+          {!loading && products[0] && (
+            <div className="animate-float absolute left-0 top-[30px] z-[2]">
+              <HeroProductcard
+                image={products[0].images?.[0] || "/placeholder.png"}
+                nom={products[0].nom}
+                prix={products[0].prix}
+                boutique={products[0].boutique_nom}
+                note={products[0].note_moyenne || 0}
+              />
+            </div>
+          )}
+          {!loading && products[1] && (
+            <div className="animate-float-delay absolute right-0 top-0 z-[1]">
+              <HeroProductcard
+                image={products[1].images?.[0] || "/placeholder.png"}
+                nom={products[1].nom}
+                prix={products[1].prix}
+                boutique={products[1].boutique_nom}
+                note={products[1].note_moyenne || 0}
+              />
+            </div>
+          )}
+          {!loading && products[2] && (
+            <div className="animate-float absolute z-[3]" style={{ left: "110px", bottom: "20px", animationDelay: "0.8s" }}>
+              <HeroProductcard
+                image={products[2].images?.[0] || "/placeholder.png"}
+                nom={products[2].nom}
+                prix={products[2].prix}
+                boutique={products[2].boutique_nom}
+                note={products[2].note_moyenne || 0}
+              />
+            </div>
+          )}
         </div>
+
+        {/* ── Mobile product preview — horizontal scroll ── */}
+        {/* Visible on mobile/tablet only, hidden on lg */}
+        {!loading && products.length > 0 && (
+          <div className="lg:hidden w-full">
+            <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+              {products.map((p) => (
+                <div key={p.id} className="snap-start shrink-0">
+                  <HeroProductcard
+                    image={p.images?.[0] || "/placeholder.png"}
+                    nom={p.nom}
+                    prix={p.prix}
+                    boutique={p.boutique_nom}
+                    note={p.note_moyenne || 0}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Divider */}
-      <div style={{ padding: "0 80px 20px", maxWidth: "1280px", margin: "0 auto", width: "100%" }}>
+      <div className="px-6 sm:px-10 lg:px-20 pb-5 max-w-[1280px] mx-auto w-full">
         <div className="divider" />
         <div
-          style={{
-            textAlign: "center",
-            marginTop: "12px",
-            fontFamily: "DM Sans, sans-serif",
-            fontSize: "11px",
-            letterSpacing: "3px",
-            textTransform: "uppercase",
-            color: "rgba(255,255,255,0.3)",
-          }}
+          className="text-center mt-3 text-[11px] tracking-[3px] uppercase"
+          style={{ fontFamily: "DM Sans, sans-serif", color: "rgba(255,255,255,0.3)" }}
         >
           Produits Populaires
         </div>

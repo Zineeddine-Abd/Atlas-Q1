@@ -1,3 +1,10 @@
+/**
+ * @file components/ui/button.tsx
+ * @description Composant bouton polymorphique avec variantes et tailles.
+ * Variantes : default (indigo), destructive, outline, secondary, ghost, link.
+ * Tailles : default, sm, lg, icon.
+ * Supporte `asChild` via Radix UI Slot pour rendre un autre élément avec les styles du bouton.
+ */
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"

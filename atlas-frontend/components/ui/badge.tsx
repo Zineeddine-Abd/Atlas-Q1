@@ -1,3 +1,8 @@
+/**
+ * @file components/ui/badge.tsx
+ * @description Badge inline avec variantes (default, secondary, destructive, outline).
+ * Basé sur Radix UI Slot + class-variance-authority.
+ */
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";

@@ -1,7 +1,15 @@
+/**
+ * @file components/ui/Input.tsx
+ * @description Champ de saisie stylisé avec anneau de focus indigo.
+ */
 import { InputHTMLAttributes } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {}
 
+/**
+ * Champ de saisie HTML stylisé. Accepte toutes les props natives `<input>`.
+ * @param {InputProps} props - Props natives HTMLInputElement + className optionnel
+ */
 export function Input({ className = "", ...props }: InputProps) {
   return (
     <input

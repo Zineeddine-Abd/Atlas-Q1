@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Liste des arguments marketing affichés dans la section "Pourquoi Atlas ?".
+ * Chaque entrée contient une icône SVG, un titre court et une description.
+ */
 const reasons = [
   {
     icon: (
@@ -30,109 +34,60 @@ const reasons = [
   },
 ];
 
+/**
+ * Section "Pourquoi Atlas ?" de la page d'accueil.
+ *
+ * Affiche trois cartes animées présentant les avantages clés de la plateforme :
+ * multi-vendeurs, paiement sécurisé, et livraison rapide.
+ * La grille passe de 1 colonne (mobile) à 3 colonnes (desktop).
+ *
+ * @returns La section marketing avec les trois cartes d'avantages.
+ */
 export default function WhyAtlas() {
   return (
-    <section
-      style={{
-        background: "white",
-        padding: "80px 80px",
-      }}
-    >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+    <section className="bg-white py-12 px-4 sm:py-16 sm:px-8 md:py-20 md:px-20">
+      <div className="max-w-[1200px] mx-auto">
 
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: "52px" }}>
+        <div className="text-center mb-10 sm:mb-12">
           <h2
-            style={{
-              fontFamily: "Syne, sans-serif",
-              fontWeight: "700",
-              fontSize: "26px",
-              color: "#111",
-              marginBottom: "10px",
-            }}
+            className="text-xl sm:text-2xl font-bold text-[#111] mb-2"
+            style={{ fontFamily: "Syne, sans-serif" }}
           >
             Pourquoi Atlas ?
           </h2>
           <p
-            style={{
-              fontFamily: "DM Sans, sans-serif",
-              fontSize: "14px",
-              color: "#888",
-            }}
+            className="text-xs sm:text-sm text-[#888]"
+            style={{ fontFamily: "DM Sans, sans-serif" }}
           >
             Une marketplace qui fait la différence
           </p>
         </div>
 
-        {/* Cards grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "24px",
-          }}
-        >
+        {/* Cards grid — 1 col mobile, 3 col desktop */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {reasons.map((reason) => (
             <div
               key={reason.title}
-              style={{
-                border: "1px solid #e8eaf0",
-                borderRadius: "16px",
-                padding: "36px 28px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
-                gap: "16px",
-                transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
-                cursor: "default",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)";
-                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 12px 32px rgba(59,107,255,0.1)";
-                (e.currentTarget as HTMLDivElement).style.borderColor = "#3b6bff";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
-                (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-                (e.currentTarget as HTMLDivElement).style.borderColor = "#e8eaf0";
-              }}
+              className="border border-[#e8eaf0] rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center gap-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-[rgba(59,107,255,0.1)] hover:border-[#3b6bff]"
             >
               {/* Icon container */}
-              <div
-                style={{
-                  width: "60px",
-                  height: "60px",
-                  borderRadius: "16px",
-                  background: "rgba(59,107,255,0.08)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+              <div className="w-14 h-14 rounded-2xl bg-[rgba(59,107,255,0.08)] flex items-center justify-center">
                 {reason.icon}
               </div>
 
               {/* Title */}
               <div
-                style={{
-                  fontFamily: "Syne, sans-serif",
-                  fontWeight: "700",
-                  fontSize: "16px",
-                  color: "#111",
-                }}
+                className="text-sm sm:text-base font-bold text-[#111]"
+                style={{ fontFamily: "Syne, sans-serif" }}
               >
                 {reason.title}
               </div>
 
               {/* Description */}
               <p
-                style={{
-                  fontFamily: "DM Sans, sans-serif",
-                  fontSize: "13px",
-                  color: "#777",
-                  lineHeight: "1.7",
-                }}
+                className="text-xs sm:text-[13px] text-[#777] leading-relaxed"
+                style={{ fontFamily: "DM Sans, sans-serif" }}
               >
                 {reason.description}
               </p>

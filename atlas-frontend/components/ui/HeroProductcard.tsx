@@ -1,4 +1,7 @@
-interface ProductCardProps {
+// components/hero/HeroProductCard.tsx
+
+/** Props du composant HeroProductCard utilisé dans la section héro de la page d'accueil. */
+interface HeroProductCardProps {
   image: string;
   nom: string;
   prix: number;
@@ -8,7 +11,21 @@ interface ProductCardProps {
   className?: string;
 }
 
-export default function ProductCard({
+/**
+ * Carte produit décorative affichée dans la section héro de la page d'accueil.
+ *
+ * Affiche une image de produit, son nom, son prix, la boutique vendeur et la note en étoiles.
+ * Conçue pour être superposée sur l'arrière-plan du héro avec des styles inline personnalisables.
+ *
+ * @param image - URL de l'image du produit.
+ * @param nom - Nom du produit affiché sous l'image.
+ * @param prix - Prix du produit affiché en euros.
+ * @param boutique - Nom de la boutique vendeur.
+ * @param note - Note du produit sur 5 (nombre d'étoiles pleines affichées).
+ * @param style - Styles CSS inline additionnels pour le positionnement dans le héro.
+ * @param className - Classes Tailwind CSS additionnelles.
+ */
+export default function HeroProductCard({
   image,
   nom,
   prix,
@@ -16,7 +33,7 @@ export default function ProductCard({
   note,
   style,
   className,
-}: ProductCardProps) {
+}: HeroProductCardProps) {
   return (
     <div
       className={className}
@@ -50,7 +67,7 @@ export default function ProductCard({
         {nom}
       </div>
       <div style={{ fontFamily: "Syne, sans-serif", fontWeight: "700", fontSize: "16px", color: "#3b6bff", marginBottom: "6px" }}>
-        {prix}
+        {prix} €
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
         <div

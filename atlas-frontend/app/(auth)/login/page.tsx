@@ -7,11 +7,26 @@ import { authClient } from "@/lib/auth-client";
 import { Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 
+/**
+ * Schéma de validation Zod pour le formulaire de connexion.
+ * Vérifie que l'email est valide et que le mot de passe n'est pas vide.
+ */
 const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Veuillez entrer une adresse email valide."),
   motDePasse: z.string().min(1, "Veuillez entrer votre mot de passe."),
 });
 
+/**
+ * Page de connexion à l'espace Atlas.
+ *
+ * Affiche un formulaire email + mot de passe avec :
+ * - Validation côté client via Zod avant tout appel réseau.
+ * - Bouton œil pour afficher/masquer le mot de passe.
+ * - Redirection automatique : vendeurs → `/dashboard`, clients → `/`.
+ * - Gestion des erreurs BetterAuth (email non vérifié, identifiants incorrects).
+ *
+ * @returns La page de connexion complète.
+ */
 export default function LoginPage() {
   const router = useRouter();
 
@@ -49,9 +64,9 @@ export default function LoginPage() {
       } else if (data?.user) {
         // Redirige vers le bon tableau de bord en fonction du rôle
         const userRole = (data.user as any).role;
-        const isSeller = userRole === "VENDEUR";
+        const isSeller = userRole === "SELLER" || userRole === "VENDEUR";
         router.refresh();
-        router.push(isSeller ? "/seller/dashboard" : "/client/dashboard");
+        router.push(isSeller ? "/dashboard" : "/");
       }
     } catch (err) {
       setError("Email ou mot de passe incorrect.");
@@ -117,20 +132,12 @@ export default function LoginPage() {
                 </button>
               </div>
 
-              <div className="flex justify-end mt-0.5">
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-indigo-600 font-medium hover:underline"
-                >
-                  Mot de passe oublié ?
-                </Link>
-              </div>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 mt-2 shadow-sm shadow-indigo-500/20"
+              className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 mt-2 shadow-sm shadow-indigo-500/20 cursor-pointer"
             >
               {isLoading ? "Connexion en cours..." : "Se connecter"}
             </button>

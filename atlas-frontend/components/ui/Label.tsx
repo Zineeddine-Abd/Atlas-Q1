@@ -1,3 +1,7 @@
+/**
+ * @file components/ui/Label.tsx
+ * @description Étiquette de formulaire stylisée (gras, petite taille, gris foncé).
+ */
 import { LabelHTMLAttributes } from "react";
 
 interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {}

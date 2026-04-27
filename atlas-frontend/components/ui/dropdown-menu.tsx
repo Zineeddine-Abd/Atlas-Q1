@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * @file components/ui/dropdown-menu.tsx
+ * @description Menu déroulant complet basé sur Radix UI DropdownMenu.
+ * Exports : DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
+ * DropdownMenuGroup, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator,
+ * DropdownMenuCheckboxItem, DropdownMenuRadioGroup, DropdownMenuRadioItem,
+ * DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent.
+ */
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";

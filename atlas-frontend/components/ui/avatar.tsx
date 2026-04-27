@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * @file components/ui/avatar.tsx
+ * @description Composant avatar circulaire basé sur Radix UI Avatar.
+ * Exports : Avatar (conteneur), AvatarImage (image Next.js), AvatarFallback (initiales).
+ */
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import Image from "next/image";

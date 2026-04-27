@@ -3,6 +3,14 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 
+/**
+ * Page de confirmation de vérification d'email.
+ *
+ * Affichée après que l'utilisateur a cliqué sur le lien de vérification
+ * reçu par email. Affiche un message de succès et un bouton pour se connecter.
+ *
+ * @returns La page de confirmation d'email vérifié.
+ */
 export default function EmailVerifiedPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-50 py-12 px-4 relative overflow-hidden font-sans w-full">

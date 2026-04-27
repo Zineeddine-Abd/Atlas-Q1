@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * @file components/RoleSwitcher.tsx
+ * @description Widget de développement fixé en bas à droite.
+ * Affiche le rôle actuel de l'utilisateur et propose une déconnexion rapide.
+ * Invisible si aucun utilisateur n'est connecté.
+ */
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -14,6 +21,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+/**
+ * Bouton flottant affichant le rôle de l'utilisateur connecté (CLIENT ou VENDEUR)
+ * avec un menu déroulant pour se déconnecter.
+ * Rendu nul si aucun utilisateur n'est connecté.
+ */
 export function RoleSwitcher() {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -21,7 +33,7 @@ export function RoleSwitcher() {
   // ── Guard before any user access ────────────────────────────────────────────
   if (!user) return null;
 
-  const isVendor = user.role === 'VENDEUR' || user.role === 'seller';
+  const isVendor = user.role === 'VENDEUR';
   
 
   const handleLogout = () => {

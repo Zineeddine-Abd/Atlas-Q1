@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react"; // 1. Ajout de Suspense
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signUp } from "@/lib/auth-client";
 import { Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 
+/**
+ * Schéma Zod de validation du mot de passe.
+ * Exige au moins 8 caractères, une minuscule, une majuscule, un chiffre
+ * et un caractère spécial.
+ */
 const passwordSchema = z.string()
   .min(8, "Le mot de passe doit contenir au moins 8 caractères.")
   .regex(/[a-z]/, "Le mot de passe doit contenir au moins une lettre minuscule.")
@@ -14,6 +19,13 @@ const passwordSchema = z.string()
   .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre.")
   .regex(/[^a-zA-Z0-9]/, "Le mot de passe doit contenir au moins un caractère spécial.");
 
+/**
+ * Schéma Zod global du formulaire d'inscription.
+ * Valide les champs communs + les règles spécifiques au type de compte :
+ * - Particulier (buyer) : aucun champ boutique requis.
+ * - Professionnel (seller) : `shopName` obligatoire.
+ * Vérifie également que les deux mots de passe correspondent.
+ */
 const registerSchema = z.object({
   firstName: z.string().min(1, "Veuillez remplir votre prénom.").trim(),
   lastName: z.string().min(1, "Veuillez remplir votre nom.").trim(),
@@ -39,20 +51,34 @@ const registerSchema = z.object({
   }
 });
 
-export default function RegistrationPage() {
-  const [userType, setUserType] = useState<"buyer" | "seller">("buyer");
+/**
+ * Contenu du formulaire d'inscription (logique et UI).
+ *
+ * Gère deux modes via un toggle :
+ * - **Particulier** : inscription simple via BetterAuth (`signUp.email`).
+ * - **Professionnel** : appel à l'endpoint `/api/vendor/register` du backend
+ *   pour créer simultanément un compte utilisateur et une boutique.
+ *
+ * L'URL contient le paramètre `?type=seller` pour pré-sélectionner le mode vendeur
+ * (ex : depuis la landing page "Ouvrir ma boutique").
+ *
+ * @returns Le formulaire d'inscription avec toggle Particulier/Professionnel.
+ */
+function RegisterFormContent() {
+  const searchParams = useSearchParams();
+  const [userType, setUserType] = useState<"buyer" | "seller">(
+    searchParams.get("type") === "seller" ? "seller" : "buyer"
+  );
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [shopName, setShopName] = useState("");
-  const [shopDescription, setShopDescription] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const router = useRouter();
 
@@ -81,7 +107,7 @@ export default function RegistrationPage() {
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
 
       if (userType === "seller") {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "${process.env.NEXT_PUBLIC_API_URL}";
 
         const response = await fetch(`${backendUrl}/api/vendor/register`, {
           method: "POST",
@@ -91,7 +117,6 @@ export default function RegistrationPage() {
             password,
             name: fullName,
             shopName: shopName.trim(),
-            shopDescription: shopDescription.trim(),
             callbackURL: `${window.location.origin}/email-verified`,
           }),
         });
@@ -113,7 +138,7 @@ export default function RegistrationPage() {
         }
       }
 
-      setIsSuccess(true);
+      router.push("/login");
     } catch (err: any) {
       setError(err.message || "Une erreur est survenue. Veuillez réessayer.");
     } finally {
@@ -128,7 +153,7 @@ export default function RegistrationPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-50 py-12 px-4 relative overflow-hidden font-sans w-full">
       <main className="w-full max-w-[600px] z-10 my-8">
-        <div className="bg-white rounded-2xl w-full px-10 py-9 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 animate-slideUp">
+        <div className="bg-white rounded-2xl w-full px-10 py-9 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100">
 
           <div className="flex flex-col items-center">
             <div className="flex bg-zinc-100 rounded-full p-1 w-fit mb-7" role="tablist">
@@ -158,171 +183,117 @@ export default function RegistrationPage() {
             </p>
           </div>
 
-          {isSuccess ? (
-            <div className="flex flex-col items-center bg-emerald-50 border border-emerald-100 p-8 rounded-2xl text-center">
-              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-5 shadow-sm">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h2 className="text-xl font-bold text-emerald-800 mb-2">Inscription réussie !</h2>
-              <p className="text-sm text-emerald-700 mx-auto max-w-sm mb-6 leading-relaxed">
-                Un email de vérification a été envoyé à <strong className="font-semibold">{email}</strong>. 
-                Veuillez cliquer sur le lien qu'il contient pour activer votre compte.
-              </p>
-              <Link
-                href="/login"
-                className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all text-[15px] shadow-sm shadow-indigo-500/20"
-              >
-                Aller à la page de connexion
-              </Link>
+          {error && (
+            <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 rounded-xl px-3.5 py-3 text-[13.5px] font-medium mb-5">
+              {error}
             </div>
-          ) : (
-            <>
-              {error && (
-                <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 rounded-xl px-3.5 py-3 text-[13.5px] font-medium mb-5">
-                  {error}
-                </div>
-              )}
+          )}
 
-              <form onSubmit={handleRegistration} className="flex flex-col gap-5" noValidate>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-2">
-                    <label className={labelClass}>Prénom</label>
-                    <input
-                      type="text"
-                      placeholder="Jean"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      className={inputClass}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className={labelClass}>Nom</label>
-                    <input
-                      type="text"
-                      placeholder="Dupont"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className={inputClass}
-                    />
-                  </div>
-                </div>
+          <form onSubmit={handleRegistration} className="flex flex-col gap-5" noValidate>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="flex flex-col gap-2">
+                <label className={labelClass}>Prénom</label>
+                <input
+                  type="text"
+                  placeholder="Jean"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className={labelClass}>Nom</label>
+                <input
+                  type="text"
+                  placeholder="Dupont"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
 
-                <div className="flex flex-col gap-2">
-                  <label className={labelClass}>Adresse email</label>
+            <div className="flex flex-col gap-2">
+              <label className={labelClass}>Adresse email</label>
+              <input
+                type="email"
+                placeholder="jean.dupont@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={inputClass}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="flex flex-col gap-2">
+                <label className={labelClass}>Mot de passe</label>
+                <div className="relative">
                   <input
-                    type="email"
-                    placeholder="jean.dupont@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`${inputClass} pr-12`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className={labelClass}>Confirmation</label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className={`${inputClass} pr-12`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {userType === "seller" && (
+              <div className="border-t border-zinc-100 pt-6 mt-2 space-y-5">
+                <h3 className="text-base font-semibold text-gray-900">
+                  Informations de la boutique
+                </h3>
+                <div className="flex flex-col gap-2">
+                  <label className={labelClass}>Nom de la boutique</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: Tech Paradise"
+                    value={shopName}
+                    onChange={(e) => setShopName(e.target.value)}
                     className={inputClass}
                   />
                 </div>
+              </div>
+            )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-2">
-                    <label className={labelClass}>Mot de passe</label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={`${inputClass} pr-12`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </button>
-                    </div>
-                    <ul className="text-[12.5px] text-zinc-500 mt-1.5 space-y-1 pl-1">
-                      <li>• Au moins 8 caractères</li>
-                      <li>• 1 majuscule et 1 minuscule</li>
-                      <li>• 1 chiffre et 1 caractère spécial</li>
-                    </ul>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <label className={labelClass}>Confirmation</label>
-                    <div className="relative">
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`${inputClass} pr-12`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
-                      >
-                        {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {userType === "seller" && (
-                  <div className="border-t border-zinc-100 pt-6 mt-2 space-y-5">
-                    <h3 className="text-base font-semibold text-gray-900">
-                      Informations de la boutique
-                    </h3>
-                    <div className="flex flex-col gap-2">
-                      <label className={labelClass}>Nom de la boutique</label>
-                      <input
-                        type="text"
-                        placeholder="Ex: Tech Paradise"
-                        value={shopName}
-                        onChange={(e) => setShopName(e.target.value)}
-                        className={inputClass}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className={labelClass}>Description courte</label>
-                      <textarea
-                        placeholder="Décrivez votre boutique en quelques mots..."
-                        value={shopDescription}
-                        onChange={(e) => setShopDescription(e.target.value)}
-                        className={`${inputClass} min-h-[100px] resize-y`}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={
-                    loading ||
-                    !email ||
-                    !password ||
-                    !firstName ||
-                    !lastName ||
-                    (userType === "seller" && !shopName.trim())
-                  }
-                  className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 mt-4 shadow-sm shadow-indigo-500/20"
-                >
-                  {loading
-                    ? "Création en cours..."
-                    : userType === "seller"
-                    ? "Créer ma boutique"
-                    : "Créer mon compte"}
-                </button>
-              </form>
-            </>
-          )}
+            <button
+              type="submit"
+              disabled={loading || !email || !password || !firstName || !lastName || (userType === "seller" && !shopName.trim())}
+              className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 mt-4 shadow-sm shadow-indigo-500/20 cursor-pointer"
+            >
+              {loading ? "Création en cours..." : userType === "seller" ? "Créer ma boutique" : "Créer mon compte"}
+            </button>
+          </form>
 
           <div className="mt-8 pt-6 border-t border-zinc-100">
-            <div className="relative flex items-center justify-center mb-6">
-              <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                <div className="w-full border-t border-zinc-100" />
-              </div>
-              <span className="relative bg-white px-3 text-sm text-zinc-400 font-medium">ou</span>
-            </div>
             <p className="text-zinc-500 text-sm text-center">
               Vous avez déjà un compte ?{" "}
               <Link href="/login" className="text-indigo-600 font-bold hover:underline">
@@ -333,5 +304,26 @@ export default function RegistrationPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+/**
+ * Page d'inscription (export par défaut).
+ *
+ * Enveloppe `RegisterFormContent` dans un `<Suspense>` car ce composant
+ * utilise `useSearchParams()`, qui nécessite le rendu côté client et
+ * déclenche une erreur de build sans boundary Suspense.
+ *
+ * @returns La page d'inscription avec son fallback de chargement.
+ */
+export default function RegistrationPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-zinc-50">
+        <p className="text-zinc-400 animate-pulse">Chargement du formulaire...</p>
+      </div>
+    }>
+      <RegisterFormContent />
+    </Suspense>
   );
 }

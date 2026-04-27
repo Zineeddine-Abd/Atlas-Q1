@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * @file contexts/AuthContext.tsx
+ * @description Contexte React d'authentification global.
+ * Synchronise l'état de session BetterAuth avec les composants React.
+ * Normalise le rôle "SELLER" → "VENDEUR" pour la cohérence avec le backend.
+ */
+
 import {
   createContext,
   useContext,
@@ -7,19 +14,26 @@ import {
 } from "react";
 import { useSession, signOut } from "@/lib/auth-client";
 
+/** Données utilisateur exposées par le contexte */
 interface User {
   id: string;
   name: string;
   email: string;
+  /** Rôle normalisé : "CLIENT" | "VENDEUR" */
   role: string;
   image?: string | null;
   [key: string]: unknown;
 }
 
+/** Valeur exposée par AuthContext */
 interface AuthContextType {
+  /** Utilisateur connecté, ou null si non authentifié */
   user: User | null;
+  /** true pendant le chargement initial de la session */
   isLoading: boolean;
+  /** true si un utilisateur est connecté */
   isAuthenticated: boolean;
+  /** Déconnecte l'utilisateur et redirige vers la page d'accueil */
   logout: () => Promise<void>;
 }
 
@@ -30,8 +44,15 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
+/**
+ * Fournisseur du contexte d'authentification.
+ * Lit la session BetterAuth via `useSession` et la transforme en `User`.
+ * À placer au niveau de la racine de l'application (dans `providers.tsx`).
+ * @param {{ children: ReactNode }} props
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: session, isPending } = useSession();
+  console.log("SESSION:", { session, isPending });
 
   const user = session?.user
     ? ({
@@ -48,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     await signOut();
-    window.location.href = "/login"; // Redirige après déconnexion
+    window.location.href = "/";
   };
 
   return (
@@ -65,6 +86,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Hook pour accéder au contexte d'authentification dans n'importe quel composant client.
+ * @returns {AuthContextType} Utilisateur, état de chargement, et fonction de déconnexion
+ * @throws {Error} Si utilisé en dehors d'un AuthProvider
+ */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
