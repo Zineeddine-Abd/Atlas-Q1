@@ -5,8 +5,9 @@
  * Les erreurs HTTP sont transformées en exceptions JavaScript.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
-
+const API_BASE_URL = typeof window === "undefined"
+  ? process.env.API_URL  // server-side: direct to Render
+  : "";                  // client-side: through Vercel proxy
 /**
  * Fonction utilitaire générique pour les appels à l'API backend.
  * Ajoute l'en-tête `Content-Type: application/json` par défaut.
@@ -92,11 +93,15 @@ export async function removeFromCart(itemId: number) {
     method: 'DELETE',
     credentials: 'include',
   });
-  const data = await res.json();
+
   if (!res.ok) {
-    throw new Error(data.error || "Erreur lors de la suppression");
+    const error = await res.text();
+    throw new Error(error || `API error: ${res.status}`);
   }
-  return data;
+
+  // Handle 204 No Content (empty body)
+  const text = await res.text();
+  return text ? JSON.parse(text) : {};
 }
 
 // ─── Categories ───────────────────────────────────────────────────────────────

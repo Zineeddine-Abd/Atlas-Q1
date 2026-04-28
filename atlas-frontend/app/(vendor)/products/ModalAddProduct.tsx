@@ -114,8 +114,7 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
 
   useEffect(() => {
     setLoadingCategories(true);
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    fetch(`${apiUrl}/api/categories`, { credentials: "include" })
+    fetch(`/api/categories`, { credentials: "include" })
       .then((r) => r.json())
       .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch((err) => console.error("Erreur chargement catégories:", err))
@@ -324,11 +323,10 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
       variantes: variantesFormatees,
     };
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(
       produitInitial
-        ? `${apiUrl}/api/vendor/products/${produitInitial.id}`
-        : `${apiUrl}/api/vendor/products`,
+        ? `/api/vendor/products/${produitInitial.id}`
+        : `/api/vendor/products`,
       {
         method: produitInitial ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },

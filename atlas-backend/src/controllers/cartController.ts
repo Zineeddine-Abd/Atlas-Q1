@@ -182,8 +182,8 @@ export async function updateItem(req: Request, res: Response) {
     const panierId = await getOrCreatePanier(userId);
 
     const articleRes = await pool.query(
-      `SELECT ap.*, COALESCE(vp.stock, 0) as stock FROM articles_panier ap
-       LEFT JOIN variantes_produit vp ON vp.id = ap.variante_id
+      `SELECT ap.*, vp.stock FROM articles_panier ap
+       JOIN variantes_produit vp ON vp.id = ap.variante_id
        WHERE ap.id = $1 AND ap.panier_id = $2`,
       [itemId, panierId]
     );
@@ -226,12 +226,6 @@ export async function removeItem(req: Request, res: Response) {
   try {
     const userId = (req as any).user.id;
     const itemId = parseInt(req.params.itemId as string);
-
-    if (isNaN(itemId)) {
-      res.status(400).json({ error: "ID article invalide" });
-      return;
-    }
-
     const panierId = await getOrCreatePanier(userId);
 
     const deleted = await pool.query(
