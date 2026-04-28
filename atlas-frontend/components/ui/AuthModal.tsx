@@ -226,7 +226,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
 
       if (userType === "seller") {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL;
+        const backendUrl = "";
         const response = await fetch(`${backendUrl}/api/vendor/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

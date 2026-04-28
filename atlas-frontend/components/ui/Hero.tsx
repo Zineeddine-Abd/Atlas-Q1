@@ -39,7 +39,7 @@ export default function Hero() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products?limite=3`)
+    fetch('/api/products?limite=3')
       .then((res) => res.json())
       .then((data) => {
         const produitsArray = data.produits || [];

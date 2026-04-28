@@ -16,7 +16,8 @@
  * - PUT    /api/vendor/products/:id/stock/:varianteId              → updateStock
  * - PATCH  /api/vendor/products/:id/stock/:varianteId/reapprovisionner → reapprovisionnerVariante
  */
-import type  { Request, Response } from "express";
+import type { Request, Response } from "express";
+import { clearCache } from "../middlewares/cache.middleware.js";
 import * as productsService from "../services/products.service.js";
 import { pool } from "../db/index.js";
 
@@ -209,6 +210,7 @@ export async function createProduit(req: Request, res: Response) {
       stock:        stock,
     });
 
+    clearCache("products");
     res.status(201).json(produit);
   } catch (error) {
     console.error("Erreur createProduit :", error);
@@ -250,6 +252,7 @@ export async function updateProduit(req: Request, res: Response) {
       categorie_id,
     });
 
+    clearCache("products");
     res.status(200).json(result);
   } catch (error) {
     console.error("Erreur updateProduit Controller:", error);
@@ -283,6 +286,7 @@ export async function deleteProduit(req: Request, res: Response) {
       return;
     }
 
+    clearCache("products");
     res.status(200).json({ message: "Produit supprimé avec succès", produit });
   } catch (error) {
     console.error("Erreur deleteProduit :", error);
@@ -350,6 +354,7 @@ export async function updateStock(req: Request, res: Response) {
       return;
     }
 
+    clearCache("products");
     res.status(200).json(variante);
   } catch (error) {
     console.error("Erreur updateStock :", error);
@@ -390,6 +395,7 @@ export async function reapprovisionnerVariante(req: Request, res: Response) {
       return res.status(404).json({ error: "Variante introuvable ou non autorisée" });
     }
 
+    clearCache("products");
     res.status(200).json(variante);
   } catch (error) {
     console.error("Erreur reapprovisionnerVariante :", error);

@@ -90,7 +90,7 @@ export default function Categories() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`)
+    fetch('/api/categories')
       .then((res) => res.json())
       .then((data) => {
         setCategories(data);

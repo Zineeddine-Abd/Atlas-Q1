@@ -154,7 +154,7 @@ export default function VendeursPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const API = "";
 
   useEffect(() => {
     fetch(`${API}/api/boutiques`)
