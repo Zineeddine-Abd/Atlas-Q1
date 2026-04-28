@@ -40,7 +40,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/sellers"
+                  href="/vendeurs"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Devenir vendeur
