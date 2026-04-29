@@ -15,6 +15,7 @@ import { Star, ShoppingCart, Minus, Plus, Store, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useAuthModal } from "@/contexts/AuthModalContext";
+import { useCart } from "@/contexts/CartContext";
 // TYPES --------------------------------
 
 type Variante = {
@@ -84,6 +85,7 @@ export default function FicheProduitPage({ params }: { params: Promise<{ id: str
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { openLogin } = useAuthModal();
+  const { refreshCart } = useCart();
   // État mode modification 
   const [modeModification, setModeModification] = useState(false);
 
@@ -211,8 +213,13 @@ export default function FicheProduitPage({ params }: { params: Promise<{ id: str
       });
       const data = await res.json();
       if (!res.ok) {
-        setCartError(data.error || "Erreur lors de l'ajout au panier");
+        if (res.status === 401) {
+          openLogin();
+        } else {
+          setCartError(data.error || "Erreur lors de l'ajout au panier");
+        }
       } else {
+        refreshCart();
         setCartSuccess(true);
         setTimeout(() => setCartSuccess(false), 3000);
       }

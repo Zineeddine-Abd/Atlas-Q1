@@ -48,6 +48,18 @@ function StatusModal({
   const [statut, setStatut] = useState(article.statut);
   const [suivi, setSuivi] = useState(article.numero_suivi || '');
   const [transporteur, setTransporteur] = useState(article.transporteur || '');
+  const [error, setError] = useState('');
+
+  const isExpedieInvalid = statut === 'EXPEDIE' && (!transporteur.trim() || !suivi.trim());
+
+  const handleConfirm = () => {
+    if (statut === 'EXPEDIE' && (!transporteur.trim() || !suivi.trim())) {
+      setError('Le transporteur et le numéro de suivi sont obligatoires pour le statut "Expédié".');
+      return;
+    }
+    setError('');
+    onConfirm(article.id, statut, suivi, transporteur);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -57,10 +69,16 @@ function StatusModal({
           Commande #{article.commandes?.id}
         </p>
 
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg px-3 py-2 text-xs font-medium mb-4">
+            {error}
+          </div>
+        )}
+
         <label className="block text-xs text-[#6F727B] mb-1">Nouveau statut</label>
         <select
           value={statut}
-          onChange={(e) => setStatut(e.target.value)}
+          onChange={(e) => { setStatut(e.target.value); setError(''); }}
           className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#0D1B3E] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
         >
           {STATUTS.map((s) => (
@@ -70,21 +88,29 @@ function StatusModal({
 
         {statut === 'EXPEDIE' && (
           <>
-            <label className="block text-xs text-[#6F727B] mb-1">Transporteur</label>
+            <label className="block text-xs text-[#6F727B] mb-1">
+              Transporteur <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               placeholder="ex: Colissimo, DHL..."
               value={transporteur}
-              onChange={(e) => setTransporteur(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              onChange={(e) => { setTransporteur(e.target.value); setError(''); }}
+              className={`w-full border rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] ${
+                !transporteur.trim() && error ? 'border-red-300' : 'border-gray-200'
+              }`}
             />
-            <label className="block text-xs text-[#6F727B] mb-1">Numéro de suivi</label>
+            <label className="block text-xs text-[#6F727B] mb-1">
+              Numéro de suivi <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               placeholder="ex: FR123456789"
               value={suivi}
-              onChange={(e) => setSuivi(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              onChange={(e) => { setSuivi(e.target.value); setError(''); }}
+              className={`w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] ${
+                !suivi.trim() && error ? 'border-red-300' : 'border-gray-200'
+              }`}
             />
           </>
         )}
@@ -97,7 +123,7 @@ function StatusModal({
             Annuler
           </button>
           <button
-            onClick={() => onConfirm(article.id, statut, suivi, transporteur)}
+            onClick={handleConfirm}
             disabled={isLoading || statut === article.statut}
             className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338ca] disabled:opacity-50"
           >

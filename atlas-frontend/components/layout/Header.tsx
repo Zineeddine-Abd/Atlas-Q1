@@ -26,6 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import Image from "next/image";
 import logo from "@/assets/Atlas_logo_blanc.png";
 
@@ -34,7 +35,7 @@ type Role = "CLIENT" | "VENDEUR" | "ADMIN" | null;
 
 /** Props du composant `Header`. */
 interface HeaderProps {
-  /** Nombre d'articles dans le panier, affiché comme badge sur l'icône panier. Par défaut `0`. */
+  /** @deprecated Utiliser le CartContext à la place. Ce prop est ignoré. */
   cartCount?: number;
 }
 
@@ -97,11 +98,12 @@ const HEADER_STYLE: Record<NonNullable<Role> | "VISITOR", React.CSSProperties> =
  *
  * @param cartCount - Nombre d'articles dans le panier (affichés en badge sur l'icône).
  */
-export function Header({ cartCount = 0 }: HeaderProps) {
+export function Header({}: HeaderProps) {
   const { user, isAuthenticated, logout , isLoading  } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const { openLogin, openRegister } = useAuthModal();
+  const { cartCount } = useCart();
   const isAuthPage = pathname === "/login" || pathname === "/register";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

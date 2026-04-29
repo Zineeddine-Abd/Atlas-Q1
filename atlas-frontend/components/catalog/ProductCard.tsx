@@ -120,6 +120,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         onAddToCart?.(product);
         setTimeout(() => setStatus("idle"), 1500);
       } else if (res.status === 401) {
+        setStatus("idle");
         openLogin();
       } else if (res.status === 400) {
         const data = await res.json();
