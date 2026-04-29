@@ -71,16 +71,20 @@ router.get('/kpis', async (req: Request, res: Response) => {
     if (!boutique) return;
 
     const revenueResult = await pool.query(
-      `SELECT COALESCE(SUM(prix_unitaire * quantite), 0) AS total
-       FROM articles_commande
-       WHERE boutique_id = $1`,
+      `SELECT COALESCE(SUM(ac.prix_unitaire * ac.quantite), 0) AS total
+       FROM articles_commande ac
+       JOIN commandes c ON c.id = ac.commande_id
+       WHERE ac.boutique_id = $1
+         AND c.statut NOT IN ('ANNULEE', 'EN_ATTENTE_PAIEMENT')`,
       [boutique.id]
     );
 
     const ordersResult = await pool.query(
-      `SELECT COUNT(DISTINCT commande_id) AS count
-       FROM articles_commande
-       WHERE boutique_id = $1`,
+      `SELECT COUNT(DISTINCT ac.commande_id) AS count
+       FROM articles_commande ac
+       JOIN commandes c ON c.id = ac.commande_id
+       WHERE ac.boutique_id = $1
+         AND c.statut NOT IN ('ANNULEE', 'EN_ATTENTE_PAIEMENT')`,
       [boutique.id]
     );
 
@@ -154,7 +158,9 @@ router.get('/top-products', async (req: Request, res: Response) => {
        JOIN variantes_produit vp ON vp.id = ac.variante_id
        JOIN produits p           ON p.id  = vp.produit_id
        LEFT JOIN categories c    ON c.id  = p.categorie_id
+       JOIN commandes cmd        ON cmd.id = ac.commande_id
        WHERE ac.boutique_id = $1
+         AND cmd.statut NOT IN ('ANNULEE', 'EN_ATTENTE_PAIEMENT')
        GROUP BY p.id, p.nom, p.images, c.nom
        ORDER BY "unitsSold" DESC
        LIMIT 5`,

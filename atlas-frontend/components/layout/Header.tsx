@@ -432,16 +432,18 @@ export function Header({ cartCount = 0 }: HeaderProps) {
             {/* Mobile auth buttons — VISITOR only */}
             {roleKey === "VISITOR" && !isAuthPage && (
               <div className="flex gap-2 mt-4 px-4">
-                <Link href="/login" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                  <button className="w-full py-2.5 rounded-xl text-sm font-medium bg-transparent border border-white/30 text-white cursor-pointer hover:bg-white/10 transition-colors">
-                    Connexion
-                  </button>
-                </Link>
-                <Link href="/register" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                  <button className="w-full py-2.5 rounded-xl text-sm font-medium bg-[#4F46E5] text-white border border-transparent cursor-pointer hover:bg-[#4338CA] transition-colors">
-                    Inscription
-                  </button>
-                </Link>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); openLogin(); }}
+                  className="flex-1 w-full py-2.5 rounded-xl text-sm font-medium bg-transparent border border-white/30 text-white cursor-pointer hover:bg-white/10 transition-colors"
+                >
+                  Connexion
+                </button>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); openRegister(); }}
+                  className="flex-1 w-full py-2.5 rounded-xl text-sm font-medium bg-[#4F46E5] text-white border border-transparent cursor-pointer hover:bg-[#4338CA] transition-colors"
+                >
+                  Inscription
+                </button>
               </div>
             )}
           </div>

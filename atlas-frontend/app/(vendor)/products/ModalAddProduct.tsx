@@ -260,6 +260,19 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
 
     if (!form.nom.trim()) return setFormError("Le nom du produit est obligatoire.");
     if (!form.prix || parseFloat(form.prix) <= 0) return setFormError("Le prix de base doit être supérieur à 0.");
+
+    // ── Validation du prix barré ────────────────────────────────────────
+    if (form.prix_compare) {
+      const prixCompare = parseFloat(form.prix_compare);
+      const prixBase = parseFloat(form.prix);
+      if (isNaN(prixCompare) || prixCompare <= 0) {
+        return setFormError("Le prix barré doit être un nombre positif.");
+      }
+      if (prixCompare <= prixBase) {
+        return setFormError("Le prix barré doit être supérieur au prix de base (il représente l'ancien prix avant réduction).");
+      }
+    }
+
     if (!form.categorie_id) return setFormError("Veuillez sélectionner une catégorie.");
     if (form.images.length === 0) return setFormError("Veuillez ajouter au moins une image.");
 

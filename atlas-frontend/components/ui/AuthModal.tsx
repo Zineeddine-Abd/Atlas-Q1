@@ -160,7 +160,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
 
       <div className="mt-6 pt-5 border-t border-zinc-100 text-center text-sm text-zinc-500">
         Pas encore de compte ?{" "}
-        <button onClick={onSwitchToRegister} className="text-indigo-600 font-bold hover:underline cursor-pointer">
+        <button onClick={() => onSwitchToRegister()} className="text-indigo-600 font-bold hover:underline cursor-pointer">
           S'inscrire
         </button>
       </div>

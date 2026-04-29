@@ -38,7 +38,7 @@ export function RoleSwitcher() {
 
   const handleLogout = () => {
     logout();
-    router.push('/register');
+    router.push('/');
   };
 
   return (

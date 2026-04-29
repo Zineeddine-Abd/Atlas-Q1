@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { useAuthModal } from "@/contexts/AuthModalContext";
 import {
   Package,
   ArrowLeft,
@@ -166,10 +167,11 @@ export default function MesCommandesPage() {
   const [cancelling, setCancelling] = useState<number | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<number | null>(null);
+  const { openLogin } = useAuthModal();
 
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) router.push("/login");
+    if (!isLoading && !isAuthenticated) openLogin();
   }, [isLoading, isAuthenticated, router]);
 
   useEffect(() => {

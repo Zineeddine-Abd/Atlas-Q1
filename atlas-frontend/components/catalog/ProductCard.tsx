@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ShoppingCart, Star, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
+import { useAuthModal } from "@/contexts/AuthModalContext";
 
 // TYPES --------------------------------------
 
@@ -74,6 +75,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { refreshCart } = useCart();
+  const { openLogin } = useAuthModal();
 
   const handleAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -118,7 +120,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         onAddToCart?.(product);
         setTimeout(() => setStatus("idle"), 1500);
       } else if (res.status === 401) {
-        window.location.href = "/login";
+        openLogin();
       } else if (res.status === 400) {
         const data = await res.json();
         setErrorMessage(data.error || "Stock insuffisant");
