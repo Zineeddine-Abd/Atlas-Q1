@@ -102,6 +102,16 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/boutiques", boutiquesRouter);
 
 /**
+ * GET /health
+ * @summary Vérifie que le serveur est opérationnel (utilisé par UptimeRobot)
+ * @tags Système
+ * @return {object} 200 - Serveur en ligne - application/json
+ */
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+/**
  * GET /api/me
  * @summary Retourne les informations de l'utilisateur et de la session courante
  * @tags Authentification
