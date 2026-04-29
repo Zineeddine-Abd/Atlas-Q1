@@ -145,6 +145,7 @@ export default function MesProduitsPage() {
 
   const [produitASupprimer, setProduitASupprimer] = useState<Produit | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
 
   const chargerProduits = () => {
     fetch('/api/vendor/products', { credentials: "include" })  // ← URL relative via proxy Vercel
@@ -155,6 +156,14 @@ export default function MesProduitsPage() {
 
   useEffect(() => {
     chargerProduits();
+    fetch('/api/categories', { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCategories(data.map((c: { nom: string }) => c.nom));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleSupprimer = (produit: Produit) => {
@@ -248,9 +257,9 @@ export default function MesProduitsPage() {
                 onChange={(e) => setFiltreCategorie(e.target.value)}
               >
                 <option>Toutes les catégories</option>
-                <option>Électronique</option>
-                <option>Mode</option>
-                <option>Maison</option>
+                {categories.map((cat) => (
+                  <option key={cat}>{cat}</option>
+                ))}
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>

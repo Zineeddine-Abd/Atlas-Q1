@@ -52,7 +52,6 @@ const AuthContext = createContext<AuthContextType>({
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: session, isPending } = useSession();
-  console.log("SESSION:", { session, isPending });
 
   const user = session?.user
     ? ({

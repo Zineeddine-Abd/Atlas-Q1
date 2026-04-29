@@ -10,7 +10,6 @@ import express from "express";
 import * as productsController from "../../controllers/products.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { vendorMiddleware } from "../../middlewares/vendor.middleware.js";
-import { clearCache } from "../../middlewares/cache.middleware.js";
 
 const vendorProductsRouter = express.Router();
 
@@ -65,7 +64,7 @@ vendorProductsRouter.get("/:id", productsController.getProduit);
  * @return {ErrorResponse} 500 - Erreur serveur lors de la création - application/json
  * @security cookieAuth
  */
-vendorProductsRouter.post("/", productsController.createProduit, () => clearCache("products"));
+vendorProductsRouter.post("/", productsController.createProduit);
 
 /**
  * PUT /api/vendor/products/{id}
@@ -88,7 +87,7 @@ vendorProductsRouter.post("/", productsController.createProduit, () => clearCach
  * @return {ErrorResponse} 500 - Erreur lors de la mise à jour - application/json
  * @security cookieAuth
  */
-vendorProductsRouter.put("/:id", productsController.updateProduit, () => clearCache("products"));
+vendorProductsRouter.put("/:id", productsController.updateProduit);
 
 /**
  * DELETE /api/vendor/products/{id}
@@ -102,7 +101,7 @@ vendorProductsRouter.put("/:id", productsController.updateProduit, () => clearCa
  * @return {ErrorResponse} 500 - Erreur serveur - application/json
  * @security cookieAuth
  */
-vendorProductsRouter.delete("/:id", productsController.deleteProduit, () => clearCache("products"));
+vendorProductsRouter.delete("/:id", productsController.deleteProduit);
 
 /**
  * GET /api/vendor/products/{id}/stock
