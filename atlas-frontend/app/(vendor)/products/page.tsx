@@ -65,11 +65,12 @@ function DeleteConfirmModal({
             </div>
             <div>
               <h2 className="text-base font-semibold text-[#1e293b]">
-                Supprimer ce produit ?
+                Désactiver ce produit ?
               </h2>
               <p className="text-sm text-gray-500 mt-1 leading-relaxed">
                 <span className="font-medium text-gray-700">« {produit.nom} »</span> sera
-                définitivement supprimé. Cette action est irréversible.
+                masqué du catalogue et son stock sera remis à zéro. L&apos;historique des
+                commandes associées est conservé.
               </p>
             </div>
           </div>
@@ -110,12 +111,12 @@ function DeleteConfirmModal({
               {isLoading ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Suppression...
+                  Désactivation...
                 </>
               ) : (
                 <>
                   <Trash2 className="w-3.5 h-3.5" />
-                  Supprimer
+                  Désactiver
                 </>
               )}
             </button>

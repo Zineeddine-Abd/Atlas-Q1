@@ -15,9 +15,11 @@ interface CartContextType {
   cartCount: number;
   /** Recharge le compteur depuis l'API (à appeler après ajout/suppression) */
   refreshCart: () => void;
+  /** Réinitialise immédiatement le compteur à 0 (à appeler après une commande confirmée) */
+  clearCart: () => void;
 }
 
-const CartContext = createContext<CartContextType>({ cartCount: 0, refreshCart: () => {} });
+const CartContext = createContext<CartContextType>({ cartCount: 0, refreshCart: () => {}, clearCart: () => {} });
 
 /**
  * Fournisseur du contexte panier.
@@ -46,12 +48,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       .catch(() => setCartCount(0));
   }, []);
 
+  const clearCart = useCallback(() => {
+    setCartCount(0);
+  }, []);
+
   useEffect(() => {
     refreshCart();
   }, [refreshCart]);
 
   return (
-    <CartContext.Provider value={{ cartCount, refreshCart }}>
+    <CartContext.Provider value={{ cartCount, refreshCart, clearCart }}>
       {children}
     </CartContext.Provider>
   );

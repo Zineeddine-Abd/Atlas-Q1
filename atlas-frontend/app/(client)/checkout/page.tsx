@@ -15,6 +15,7 @@ import {
   AddressData,
   ShippingMethod,
 } from "@/lib/checkout";
+import { useCart } from "@/contexts/CartContext";
 
 /** Ordre des étapes du tunnel de commande. */
 const STEP_ORDER: CheckoutStep[] = ["address", "shipping", "payment", "confirmation"];
@@ -107,6 +108,7 @@ function OrderSummarySidebar({
  * @returns La page checkout avec l'indicateur d'étapes et la sidebar de résumé.
  */
 export default function CheckoutPage() {
+  const { clearCart } = useCart();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("address");
   const [completedSteps, setCompletedSteps] = useState<CheckoutStep[]>([]);
   const [shippingCost, setShippingCost] = useState<number>(0);
@@ -211,8 +213,10 @@ export default function CheckoutPage() {
   // Step 3: Payment success ------------------------------------------------
   // Stripe has confirmed the payment client-side.
   // The webhook (payment_intent.succeeded) will update the DB on the backend.
-  // We just advance to confirmation.
+  // We reset the cart count immediately so the badge disappears without waiting
+  // for the async webhook to fire.
   const handlePaymentSuccess = () => {
+    clearCart();
     setState((prev) => ({
       ...prev,
       orderNumber: `ATL-${commandeId}`,
