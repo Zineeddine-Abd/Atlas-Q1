@@ -27,13 +27,17 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
   const [shopLoading, setShopLoading] = useState(true);
 
   // Fetch shop status once the user is authenticated as VENDEUR
+  // Re-fetch on navigation (pathname change) to get the latest status if updated
   useEffect(() => {
     if (isLoading || !isAuthenticated || user?.role !== "VENDEUR") {
       setShopLoading(false);
       return;
     }
 
-    fetch("/api/vendor/shop/me", { credentials: "include" })
+    fetch(`/api/vendor/shop/me?t=${Date.now()}`, { 
+      credentials: "include",
+      cache: "no-store" 
+    })
       .then((res) => {
         if (res.ok) return res.json();
         throw new Error("Shop not found");
@@ -45,7 +49,7 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
         setShopStatus("EN_ATTENTE");
       })
       .finally(() => setShopLoading(false));
-  }, [isLoading, isAuthenticated, user?.role]);
+  }, [isLoading, isAuthenticated, user?.role, pathname]);
   
   // Pendant la vérification de la session, on affiche un loader minimaliste
   if (isLoading || shopLoading) {
