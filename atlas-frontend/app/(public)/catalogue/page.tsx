@@ -106,18 +106,18 @@ function CatalogueContent() {
   }, []);
 
   // Synchronise les filtres quand l'URL change (ex: clic sur nom de boutique)
-useEffect(() => {
-  const q = searchParams.get("q") || "";
-  const type = searchParams.get("recherche_type") || "tous";
-  setSearchQuery(q);
-  setSearchType(type);
-  setAppliedFilters((prev) => ({
-    ...prev,
-    searchQuery: q,
-    searchType: type,
-  }));
-  setCurrentPage(1);
-}, [searchParams]);
+  useEffect(() => {
+    const q = searchParams.get("q") || "";
+    const type = searchParams.get("recherche_type") || "tous";
+    setSearchQuery(q);
+    setSearchType(type);
+    setAppliedFilters((prev) => ({
+      ...prev,
+      searchQuery: q,
+      searchType: type,
+    }));
+    setCurrentPage(1);
+  }, [searchParams]);
 
   const [appliedFilters, setAppliedFilters] = useState(() => ({
     priceRange: [0, 1000] as [number, number],
@@ -143,14 +143,14 @@ useEffect(() => {
 
     setAppliedFilters((prev) => {
       const nextCats = cat ? [cat] : prev.selectedCategories;
-      
+
       if (
-        prev.searchQuery !== q || 
-        prev.searchType !== type || 
+        prev.searchQuery !== q ||
+        prev.searchType !== type ||
         JSON.stringify(prev.selectedCategories) !== JSON.stringify(nextCats)
       ) {
         hasChanges = true;
-        
+
         // Met à jour les états visuels pour refléter l'URL
         setSearchQuery(q);
         setSearchType(type);
@@ -204,8 +204,8 @@ useEffect(() => {
   }, [appliedFilters, currentPage]);
 
   useEffect(() => {
-      console.log("fetch déclenché, note_min:", appliedFilters.minRating);
-      fetchProducts();
+    console.log("fetch déclenché, note_min:", appliedFilters.minRating);
+    fetchProducts();
   }, [fetchProducts]);
 
   const handleCategoryToggle = (cat: string) => {
@@ -231,9 +231,9 @@ useEffect(() => {
   };
 
   const handleRatingChange = (rating: number) => {
-  setMinRating(rating);
-  setAppliedFilters((prev) => ({ ...prev, minRating: rating }));
-  setCurrentPage(1);
+    setMinRating(rating);
+    setAppliedFilters((prev) => ({ ...prev, minRating: rating }));
+    setCurrentPage(1);
   };
   const handleSearch = () => {
     setAppliedFilters((prev) => ({ ...prev, searchQuery, searchType }));

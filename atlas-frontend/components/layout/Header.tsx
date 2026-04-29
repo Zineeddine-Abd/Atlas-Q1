@@ -101,7 +101,6 @@ export function Header({ cartCount = 0 }: HeaderProps) {
   const { user, isAuthenticated, logout , isLoading  } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  console.log("pathname:", pathname);
   const { openLogin, openRegister } = useAuthModal();
   const isAuthPage = pathname === "/login" || pathname === "/register";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -110,9 +109,10 @@ export function Header({ cartCount = 0 }: HeaderProps) {
   const rawRole = user?.role?.toString()?.trim()?.toUpperCase() as Role;
   const role = VALID_ROLES.includes(rawRole) ? rawRole : null;
 
+  // Only hide header on vendor-specific pages, NOT on public /products/[id]
   const isVendeurPage =
     pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/products") ||
+    pathname === "/products" ||           // exact match: vendor product list
     pathname.startsWith("/shop") ||
     pathname.startsWith("/ventes");
     

@@ -131,10 +131,6 @@ function StripeForm({ onSuccess, onBack }: StripeFormProps) {
           {isProcessing ? "Traitement en cours…" : "Confirmer le paiement"}
         </button>
       </div>
-
-      <p className="text-center text-xs text-slate-400">
-        Carte test : <span className="font-mono font-semibold text-slate-600">4242 4242 4242 4242</span> — date et CVC quelconques
-      </p>
     </div>
   );
 }

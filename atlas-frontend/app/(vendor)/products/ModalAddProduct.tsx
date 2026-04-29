@@ -265,22 +265,27 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
 
     const variantesActives = form.variantes.filter((v) => !v.supprimee);
 
-    // ── Auto-création variante par défaut ────────────────────────────────
-    // Si aucune variante active n'a été configurée manuellement (stock vide),
-    // on injecte silencieusement une variante "Par défaut" avec stock = 0.
-    // Cela évite l'erreur backend "au moins une variante requise".
-    const hasRealVariante = variantesActives.some(
-      (v) => v.stock !== "" || v.attributs.some((a) => a.cle.trim() && a.valeur.trim())
+    // ── Validation du stock obligatoire ──────────────────────────────────
+    // Le stock doit être explicitement saisi pour au moins la première variante.
+    // Les attributs peuvent rester vides (variante par défaut), mais le stock est requis.
+    const hasAnyStockSet = variantesActives.some((v) => v.stock !== "");
+    if (!hasAnyStockSet) {
+      return setFormError("Le stock est obligatoire. Veuillez saisir le stock pour au moins une variante.");
+    }
+
+    // ── Construction des variantes à soumettre ───────────────────────────
+    // Si aucun attribut n'est renseigné, on crée une variante par défaut
+    // avec le stock saisi par le vendeur.
+    const hasAttributes = variantesActives.some(
+      (v) => v.attributs.some((a) => a.cle.trim() && a.valeur.trim())
     );
 
-    const variantesToSubmit = hasRealVariante
+    const variantesToSubmit = hasAttributes
       ? variantesActives
       : [
           {
+            ...variantesActives[0],
             attributs: [] as AttributPaire[],
-            prix_supplementaire: "0.00",
-            stock: "0",
-            seuil_stock_faible: "5",
           },
         ];
 
@@ -290,7 +295,7 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
       if ((v as FormVariante).supprimee) continue;
 
       if (v.stock === "" || parseInt(v.stock) < 0) {
-        return setFormError(`Le stock de la variante ${i + 1} est invalide.`);
+        return setFormError(`Le stock de la variante ${i + 1} est obligatoire et doit être ≥ 0.`);
       }
 
       const keys = v.attributs.map((a) => a.cle.trim().toLowerCase()).filter(Boolean);
@@ -303,7 +308,7 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
         id: (v as FormVariante).id,
         attributs: pairesToObjet(v.attributs),
         prix_supplementaire: parseFloat(v.prix_supplementaire) || 0,
-        stock: parseInt(v.stock) || 0,
+        stock: parseInt(v.stock),
         seuil_stock_faible: parseInt(v.seuil_stock_faible) || 5,
       });
     }
@@ -487,7 +492,7 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
               <div>
                 <h3 className="font-bold text-gray-800">Variantes</h3>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  Si aucune variante n'est configurée, une variante par défaut sera créée automatiquement.
+                  Les attributs sont optionnels, mais le <span className="text-red-500 font-semibold">stock est obligatoire</span>.
                 </p>
               </div>
               <button
@@ -620,11 +625,14 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-gray-500 uppercase ml-1">Stock</label>
+                      <label className="text-[11px] font-bold text-gray-500 uppercase ml-1">Stock <span className="text-red-500">*</span></label>
                       <input
                         type="text" value={variante.stock}
+                        placeholder="Requis"
                         onChange={(e) => handleVarianteChange(varianteIndex, "stock", e.target.value)}
-                        className="w-full p-3 rounded-xl border border-gray-200 text-sm outline-none"
+                        className={`w-full p-3 rounded-xl border text-sm outline-none ${
+                          variante.stock === "" ? "border-red-300 bg-red-50/30" : "border-gray-200"
+                        }`}
                       />
                     </div>
                     <div className="space-y-1">
