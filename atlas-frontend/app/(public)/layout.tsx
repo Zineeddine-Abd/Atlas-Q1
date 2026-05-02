@@ -39,7 +39,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <p className="text-gray-500 mb-8 text-sm leading-relaxed">
             En tant que vendeur, vous n&apos;avez pas accès aux pages de shopping. Votre espace est le tableau de bord vendeur.
           </p>
-          <Link href="/vendor/dashboard">
+          <Link href="/dashboard">
             <button className="w-full bg-[#5c59f2] hover:bg-[#4a47d1] text-white py-3.5 px-4 rounded-xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-indigo-100">
               <LayoutDashboard className="w-4 h-4" />
               Retourner au Dashboard

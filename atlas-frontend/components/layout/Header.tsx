@@ -290,7 +290,7 @@ export function Header({}: HeaderProps) {
 
             {/* Vendor on public pages — link back to dashboard */}
             {isAuthenticated && role === "VENDEUR" && !isVendeurPage && (
-              <Link href="/vendor/dashboard">
+              <Link href="/dashboard">
                 <button
                   style={{
                     padding: "8px 18px",
