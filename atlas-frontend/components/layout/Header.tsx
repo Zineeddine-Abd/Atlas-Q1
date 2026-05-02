@@ -229,8 +229,8 @@ export function Header({}: HeaderProps) {
           {/* Right-side actions */}
           <div className="flex items-center gap-3">
 
-            {/* Inscription / Connexion — VISITOR only, hidden on auth pages */}
-            {roleKey === "VISITOR" && !isAuthPage && (
+            {/* Inscription / Connexion — non authentifié seulement, hidden on auth pages */}
+            {!isAuthenticated && !isAuthPage && (
               <div className="hidden md:flex items-center gap-2">
                 {/* Connexion — ghost outline */}
                 
@@ -286,6 +286,30 @@ export function Header({}: HeaderProps) {
                   </button>
                 
               </div>
+            )}
+
+            {/* Vendor on public pages — link back to dashboard */}
+            {isAuthenticated && role === "VENDEUR" && !isVendeurPage && (
+              <Link href="/vendor/dashboard">
+                <button
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    background: "#4F46E5",
+                    border: "1px solid transparent",
+                    color: "white",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <LayoutDashboard style={{ width: "15px", height: "15px" }} />
+                  Tableau de bord
+                </button>
+              </Link>
             )}
 
             {/* Cart — CLIENT only */}
@@ -431,8 +455,8 @@ export function Header({}: HeaderProps) {
               ))}
             </nav>
 
-            {/* Mobile auth buttons — VISITOR only */}
-            {roleKey === "VISITOR" && !isAuthPage && (
+            {/* Mobile auth buttons — non authentifié seulement */}
+            {!isAuthenticated && !isAuthPage && (
               <div className="flex gap-2 mt-4 px-4">
                 <button
                   onClick={() => { setMobileMenuOpen(false); openLogin(); }}

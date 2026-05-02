@@ -82,8 +82,14 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
     e.stopPropagation();
     if (status === "loading" || status === "added") return;
 
+    // Multiple variants → redirect to product page so the user makes an explicit choice
+    if (product.variantes && product.variantes.length > 1) {
+      router.push(`/products/${product.id}`);
+      return;
+    }
+
     const targetVarianteId =
-      product.variantes && product.variantes.length > 0
+      product.variantes && product.variantes.length === 1
         ? product.variantes[0].id
         : null;
 
