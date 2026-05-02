@@ -6,15 +6,26 @@
  * Montées sur /api/profile dans app.ts.
  */
 import { Router } from "express";
+import multer from "multer";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import {
   getMe,
   updateMe,
+  uploadAvatar,
   getAdresses,
   createAdresse,
   setDefaultAdresse,
   deleteAdresse,
 } from "../controllers/Profilecontroller.js";
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) cb(null, true);
+    else cb(new Error("Seules les images sont autorisées."));
+  },
+});
 
 const router = Router();
 
@@ -46,6 +57,19 @@ router.get("/me", getMe);
  * @security cookieAuth
  */
 router.patch("/me", updateMe);
+
+/**
+ * POST /api/profile/avatar
+ * @summary Téléverse une photo de profil vers Supabase Storage et met à jour url_avatar
+ * @tags Profil
+ * @param {file} image.formData.required - Fichier image (max 5 Mo)
+ * @return {object} 200 - URL publique de l'avatar ({ url: string }) - application/json
+ * @return {ErrorResponse} 400 - Fichier manquant - application/json
+ * @return {ErrorResponse} 401 - Non authentifié - application/json
+ * @return {ErrorResponse} 500 - Erreur serveur - application/json
+ * @security cookieAuth
+ */
+router.post("/avatar", upload.single("image"), uploadAvatar);
 
 /**
  * GET /api/profile/adresses

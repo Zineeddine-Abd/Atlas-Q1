@@ -5,6 +5,7 @@
  */
 import type { Request, Response } from "express";
 import { pool } from "../db/index.js";
+import { supabaseAdmin } from "../lib/supabase.js";
 
 // ─────────────────────────────────────────────────────────────
 // UTILISATEUR
@@ -116,6 +117,61 @@ export async function updateMe(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.error("[updateMe]", error);
     res.status(500).json({ message: "Erreur serveur" });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// AVATAR
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Upload l'avatar de l'utilisateur vers Supabase Storage et met à jour url_avatar.
+ * Reçoit le fichier via multer (req.file) en mémoire.
+ * @param {Request} req - req.file : fichier image (max 5 Mo)
+ * @param {Response} res - Réponse JSON : 200 ({ url }) | 400 | 500
+ */
+export async function uploadAvatar(req: Request, res: Response): Promise<void> {
+  const userId = (req as any).user.id;
+  const file = (req as any).file as Express.Multer.File | undefined;
+
+  if (!file) {
+    res.status(400).json({ message: "Aucun fichier fourni." });
+    return;
+  }
+
+  try {
+    const ext = file.originalname.split(".").pop() || "jpg";
+    const fileName = `avatars/${userId}_${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from("boutiques-images")
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype,
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("[uploadAvatar] Supabase:", uploadError);
+      res.status(500).json({ message: "Erreur lors du téléversement." });
+      return;
+    }
+
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from("boutiques-images")
+      .getPublicUrl(fileName);
+
+    const avatarUrl = publicUrlData.publicUrl;
+
+    await pool.query(
+      `UPDATE public.user SET url_avatar = $1, "updatedAt" = now() WHERE id = $2`,
+      [avatarUrl, userId]
+    );
+
+    res.json({ url: avatarUrl });
+  } catch (error) {
+    console.error("[uploadAvatar]", error);
+    res.status(500).json({ message: "Erreur serveur." });
   }
 }
 

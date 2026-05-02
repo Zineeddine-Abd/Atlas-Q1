@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   User,
@@ -217,6 +217,39 @@ function ProfileTab() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    apiFetch<{ url_avatar?: string }>("/api/profile/me")
+      .then((data) => { if (data.url_avatar) setAvatarUrl(data.url_avatar); })
+      .catch(() => {});
+  }, []);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch("/api/profile/avatar", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok) setAvatarUrl(data.url);
+      else setError(data.message || "Erreur lors du chargement de la photo.");
+    } catch {
+      setError("Erreur réseau lors du chargement de la photo.");
+    } finally {
+      setAvatarUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setSaved(false);
@@ -231,7 +264,6 @@ function ProfileTab() {
         method: "PATCH",
         body: JSON.stringify({
           name: `${form.prenom} ${form.nom}`.trim(),
-          email: form.email,
           numero_telephone: form.telephone || null,
         }),
       });
@@ -252,11 +284,29 @@ function ProfileTab() {
       {/* Avatar card */}
       <div className="flex items-center gap-5 p-5 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl border border-indigo-100">
         <div className="relative">
-          <div className="h-16 w-16 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-indigo-200">
-            {initials}
+          <div className="h-16 w-16 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-indigo-200 overflow-hidden">
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={avatarUrl} alt="Photo de profil" className="w-full h-full object-cover" />
+            ) : avatarUploading ? (
+              <Loader2 className="h-6 w-6 animate-spin" />
+            ) : (
+              initials
+            )}
           </div>
-          <button className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border-2 border-indigo-100 flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-colors shadow-sm">
-            <Pencil className="h-3 w-3" />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={avatarUploading}
+            className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border-2 border-indigo-100 flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-colors shadow-sm disabled:opacity-50"
+          >
+            {avatarUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Pencil className="h-3 w-3" />}
           </button>
         </div>
         <div>
@@ -285,7 +335,8 @@ function ProfileTab() {
           <Field label="Prénom" name="prenom" value={form.prenom} onChange={handleChange} placeholder="Votre prénom" disabled={loading} />
           <Field label="Nom" name="nom" value={form.nom} onChange={handleChange} placeholder="Votre nom" disabled={loading} />
           <div className="md:col-span-2">
-            <Field label="Email" name="email" type="email" value={form.email} onChange={handleChange} placeholder="votre@email.fr" disabled={loading} />
+            <Field label="Email" name="email" type="email" value={form.email} onChange={handleChange} placeholder="votre@email.fr" disabled={true} />
+            <p className="text-xs text-gray-400 mt-1">L&apos;adresse email ne peut pas être modifiée.</p>
           </div>
           <div className="md:col-span-2">
             <Field label="Téléphone" name="telephone" type="tel" value={form.telephone} onChange={handleChange} placeholder="+33 6 00 00 00 00" disabled={loading} />
