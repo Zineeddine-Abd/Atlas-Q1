@@ -10,6 +10,7 @@
 import {
   createContext,
   useContext,
+  useState,
   type ReactNode,
 } from "react";
 import { useSession, signOut } from "@/lib/auth-client";
@@ -37,6 +38,11 @@ interface AuthContextType {
   isAuthenticated: boolean;
   /** Déconnecte l'utilisateur et redirige vers la page d'accueil */
   logout: () => Promise<void>;
+  /**
+   * Met à jour immédiatement url_avatar dans le contexte sans attendre
+   * un rechargement de la session BetterAuth (utilisé après upload d'avatar).
+   */
+  updateAvatarUrl: (url: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -44,6 +50,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   isAuthenticated: false,
   logout: async () => {},
+  updateAvatarUrl: () => {},
 });
 
 /**
@@ -55,7 +62,11 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: session, isPending } = useSession();
 
-  const user = session?.user
+  // Override local de l'avatar : mis à jour immédiatement après upload
+  // sans attendre le rechargement de la session BetterAuth.
+  const [avatarOverride, setAvatarOverride] = useState<string | null>(null);
+
+  const sessionUser = session?.user
     ? ({
         id: session.user.id,
         name: session.user.name,
@@ -67,6 +78,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         image: session.user.image,
         url_avatar: (session.user as Record<string, unknown>).url_avatar as string | null | undefined,
       } as User)
+    : null;
+
+  // Applique l'override local si présent, sinon la valeur de session
+  const user = sessionUser
+    ? { ...sessionUser, url_avatar: avatarOverride ?? sessionUser.url_avatar }
     : null;
 
   const logout = async () => {
@@ -81,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: isPending,
         isAuthenticated: !!user,
         logout,
+        updateAvatarUrl: setAvatarOverride,
       }}
     >
       {children}

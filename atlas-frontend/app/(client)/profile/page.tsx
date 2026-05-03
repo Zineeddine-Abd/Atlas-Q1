@@ -201,7 +201,7 @@ function Field({
  * @returns Le formulaire de modification du profil avec bouton de sauvegarde.
  */
 function ProfileTab() {
-  const { user } = useAuth();
+  const { user, updateAvatarUrl } = useAuth();
 
   const [form, setForm] = useState<ProfileInfo>(() => {
     const parts = (user?.name ?? "").trim().split(" ");
@@ -240,8 +240,12 @@ function ProfileTab() {
         body: formData,
       });
       const data = await res.json();
-      if (res.ok) setAvatarUrl(data.url);
-      else setError(data.message || "Erreur lors du chargement de la photo.");
+      if (res.ok) {
+        setAvatarUrl(data.url);
+        updateAvatarUrl(data.url);   // propagate immédiatement au Header via AuthContext
+      } else {
+        setError(data.message || "Erreur lors du chargement de la photo.");
+      }
     } catch {
       setError("Erreur réseau lors du chargement de la photo.");
     } finally {
