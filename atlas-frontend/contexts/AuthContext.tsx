@@ -11,6 +11,7 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
   type ReactNode,
 } from "react";
 import { useSession, signOut } from "@/lib/auth-client";
@@ -65,6 +66,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Override local de l'avatar : mis à jour immédiatement après upload
   // sans attendre le rechargement de la session BetterAuth.
   const [avatarOverride, setAvatarOverride] = useState<string | null>(null);
+
+  // Quand la session démarre, fetch url_avatar directement depuis la BDD
+  // car BetterAuth n'inclut pas toujours les additionalFields dans useSession().
+  useEffect(() => {
+    if (!session?.user) return;
+    fetch("/api/profile/me", { credentials: "include" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data?.url_avatar) setAvatarOverride(data.url_avatar); })
+      .catch(() => {});
+  }, [session?.user?.id]);
 
   const sessionUser = session?.user
     ? ({
