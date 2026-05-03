@@ -45,7 +45,11 @@ export function AddressStep({ initial, onNext }: AddressStepProps) {
     const newErrors: Partial<AddressData> = {};
     if (!form.firstName.trim()) newErrors.firstName = "Requis";
     if (!form.lastName.trim()) newErrors.lastName = "Requis";
-    if (!form.address.trim()) newErrors.address = "Requis";
+    if (!form.address.trim()) {
+      newErrors.address = "Requis";
+    } else if (form.address.trim().length < 5) {
+      newErrors.address = "Adresse trop courte";
+    }
     if (!form.postalCode.trim()) {
       newErrors.postalCode = "Requis";
     } else if (!/^\d{5}$/.test(form.postalCode.trim())) {

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { CheckoutSteps } from "@/components/checkout/CheckoutSteps";
 import { AddressStep } from "@/components/checkout/AddressStep";
 import { ShippingStep } from "@/components/checkout/ShippingStep";
@@ -295,7 +294,6 @@ export default function CheckoutPage() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }
