@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import Image from "next/image";
@@ -336,6 +336,9 @@ export function Header({}: HeaderProps) {
                 <DropdownMenuTrigger asChild>
                   <button className="text-white/80 hover:text-white hover:bg-white/10 rounded-full p-0.5 transition-colors cursor-pointer">
                     <Avatar className="h-9 w-9">
+                      {user?.url_avatar && (
+                        <AvatarImage src={user.url_avatar} alt={userName} className="object-cover" />
+                      )}
                       <AvatarFallback
                         className="text-white"
                         style={{

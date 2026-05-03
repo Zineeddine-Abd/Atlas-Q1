@@ -22,6 +22,8 @@ interface User {
   /** Rôle normalisé : "CLIENT" | "VENDEUR" */
   role: string;
   image?: string | null;
+  /** URL de la photo de profil (champ custom BetterAuth) */
+  url_avatar?: string | null;
   [key: string]: unknown;
 }
 
@@ -63,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             ? "VENDEUR"
             : ((session.user as Record<string, unknown>).role as string) || "CLIENT",
         image: session.user.image,
+        url_avatar: (session.user as Record<string, unknown>).url_avatar as string | null | undefined,
       } as User)
     : null;
 
