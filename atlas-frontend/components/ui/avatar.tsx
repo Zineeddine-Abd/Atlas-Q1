@@ -3,11 +3,10 @@
 /**
  * @file components/ui/avatar.tsx
  * @description Composant avatar circulaire basé sur Radix UI Avatar.
- * Exports : Avatar (conteneur), AvatarImage (image Next.js), AvatarFallback (initiales).
+ * Exports : Avatar (conteneur), AvatarImage (image), AvatarFallback (initiales).
  */
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-import Image from "next/image";
 
 import { cn } from "./utils";
 
@@ -29,22 +28,14 @@ function Avatar({
 
 function AvatarImage({
   className,
-  src,
-  alt = "",
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image> & {
-  src?: string;
-}) {
+}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
   return (
-    <AvatarPrimitive.Image asChild {...props}>
-      <Image
-        src={src || ""}
-        alt={alt}
-        fill
-        className={cn("aspect-square object-cover", className)}
-        sizes="(max-width: 768px) 40px, 40px"
-      />
-    </AvatarPrimitive.Image>
+    <AvatarPrimitive.Image
+      data-slot="avatar-image"
+      className={cn("size-full object-cover", className)}
+      {...props}
+    />
   );
 }
 
