@@ -227,12 +227,15 @@ export async function stripeWebhook(req: Request, res: Response) {
     );
 
     for (const article of articlesRes.rows) {
-      await dbClient.query(
+      const stockResult = await dbClient.query(
         `UPDATE variantes_produit
          SET stock = stock - $1
          WHERE id = $2 AND stock >= $1`,
         [article.quantite, article.variante_id]
       );
+      if (stockResult.rowCount === 0) {
+        throw new Error(`stock_insuffisant:variante=${article.variante_id}:quantite=${article.quantite}`);
+      }
     }
 
     const panierRes = await dbClient.query(
@@ -248,9 +251,13 @@ export async function stripeWebhook(req: Request, res: Response) {
 
     await dbClient.query("COMMIT");
     console.log(`✅ Commande #${commandeId} confirmée via Webhook`);
-  } catch (err) {
+  } catch (err: any) {
     await dbClient.query("ROLLBACK");
-    console.error(`Erreur webhook commande #${commandeId}:`, err);
+    if (err.message?.startsWith("stock_insuffisant:")) {
+      console.error(`Webhook: ${err.message} — commande #${commandeId} PAYÉE mais stock non décrémenté`);
+    } else {
+      console.error(`Erreur webhook commande #${commandeId}:`, err);
+    }
   } finally {
     dbClient.release();
   }

@@ -76,7 +76,7 @@ function CatalogueContent() {
     const cat = searchParams.get("categorie");
     return cat ? [cat] : [];
   });
-  const [sortBy, setSortBy] = useState("popular");
+  const [sortBy, setSortBy] = useState("newest");
   const [minRating, setMinRating] = useState(0);
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
   const [searchType, setSearchType] = useState(() => searchParams.get("recherche_type") || "tous");
@@ -122,7 +122,7 @@ function CatalogueContent() {
   const [appliedFilters, setAppliedFilters] = useState(() => ({
     priceRange: [0, 1000] as [number, number],
     selectedCategories: searchParams.get("categorie") ? [searchParams.get("categorie") as string] : [],
-    sortBy: "popular",
+    sortBy: "newest",
     minRating: 0,
     searchQuery: searchParams.get("q") || "",
     searchType: searchParams.get("recherche_type") || "tous",
@@ -246,11 +246,11 @@ function CatalogueContent() {
     setMinRating(0);
     setSearchQuery("");
     setSearchType("tous");
-    setSortBy("popular");
+    setSortBy("newest");
     setAppliedFilters({
       priceRange: [0, 1000],
       selectedCategories: [],
-      sortBy: "popular",
+      sortBy: "newest",
       minRating: 0,
       searchQuery: "",
       searchType: "tous",

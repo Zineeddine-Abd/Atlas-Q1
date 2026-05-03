@@ -103,56 +103,7 @@ export async function createOrder(req: Request, res: Response) {
   }
   const panierId = panierRes.rows[0]!.id;
 
-  // 3. Récupérer les articles du panier
-  const itemsRes = await pool.query(
-    `SELECT
-       ap.id            AS articles_panier_id,
-       ap.quantite,
-       vp.id            AS variante_id,
-       vp.stock,
-       vp.sku,
-       vp.prix_supplementaire,
-       p.id             AS produit_id,
-       p.nom            AS nom_produit,
-       p.prix           AS prix_base,
-       p.boutique_id
-     FROM articles_panier ap
-     JOIN variantes_produit vp ON vp.id = ap.variante_id
-     JOIN produits p            ON p.id = vp.produit_id
-     WHERE ap.panier_id = $1`,
-    [panierId]
-  );
-
-  const items = itemsRes.rows;
-  if (items.length === 0) {
-    res.status(400).json({ error: "Le panier est vide" });
-    return;
-  }
-
-  // 4. Vérifier le stock disponible (lecture seule — pas de modification)
-  const outOfStock = items.filter((item) => item.stock < item.quantite);
-  if (outOfStock.length > 0) {
-    res.status(409).json({
-      error: "Stock insuffisant",
-      items: outOfStock.map((item) => ({
-        variante_id:       item.variante_id,
-        nom_produit:       item.nom_produit,
-        sku:               item.sku,
-        stock_disponible:  item.stock,
-        quantite_demandee: item.quantite,
-      })),
-    });
-    return;
-  }
-
-  // 5. Calculer les totaux
-  const sousTotal = items.reduce((acc: number, item: any) => {
-    return acc + (Number(item.prix_base) + Number(item.prix_supplementaire)) * item.quantite;
-  }, 0);
-  const fraisLivraison = shipping.price;
-  const montantTotal   = Math.round((sousTotal + fraisLivraison) * 100) / 100;
-
-  // 6. Snapshot adresse
+  // 3. Snapshot adresse (pur JS, pas de DB)
   const adresseLivraison = {
     prenom:      address.firstName,
     nom:         address.lastName,
@@ -166,6 +117,59 @@ export async function createOrder(req: Request, res: Response) {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+
+    // 4. Lire les articles et verrouiller les lignes variantes_produit
+    // FOR UPDATE OF vp empêche deux commandes simultanées de valider le même stock
+    const itemsRes = await client.query(
+      `SELECT
+         ap.id            AS articles_panier_id,
+         ap.quantite,
+         vp.id            AS variante_id,
+         vp.stock,
+         vp.sku,
+         vp.prix_supplementaire,
+         p.id             AS produit_id,
+         p.nom            AS nom_produit,
+         p.prix           AS prix_base,
+         p.boutique_id
+       FROM articles_panier ap
+       JOIN variantes_produit vp ON vp.id = ap.variante_id
+       JOIN produits p            ON p.id = vp.produit_id
+       WHERE ap.panier_id = $1
+       FOR UPDATE OF vp`,
+      [panierId]
+    );
+
+    const items = itemsRes.rows;
+    if (items.length === 0) {
+      await client.query("ROLLBACK");
+      res.status(400).json({ error: "Le panier est vide" });
+      return;
+    }
+
+    // 5. Vérifier le stock (atomique : les lignes sont verrouillées)
+    const outOfStock = items.filter((item) => item.stock < item.quantite);
+    if (outOfStock.length > 0) {
+      await client.query("ROLLBACK");
+      res.status(409).json({
+        error: "Stock insuffisant",
+        items: outOfStock.map((item) => ({
+          variante_id:       item.variante_id,
+          nom_produit:       item.nom_produit,
+          sku:               item.sku,
+          stock_disponible:  item.stock,
+          quantite_demandee: item.quantite,
+        })),
+      });
+      return;
+    }
+
+    // 6. Calculer les totaux
+    const sousTotal = items.reduce((acc: number, item: any) => {
+      return acc + (Number(item.prix_base) + Number(item.prix_supplementaire)) * item.quantite;
+    }, 0);
+    const fraisLivraison = shipping.price;
+    const montantTotal   = Math.round((sousTotal + fraisLivraison) * 100) / 100;
 
     // 7. Insérer la commande
     const commandeRes = await client.query<{ id: number }>(

@@ -145,6 +145,7 @@ export async function getProduitsPublicFiltres(filters: any) {
   let orderBy = 'cree_le DESC';
   if (filters.tri) {
     switch (filters.tri) {
+      case 'popular':    orderBy = 'nombre_avis DESC NULLS LAST, note_moyenne DESC NULLS LAST'; break;
       case 'price-asc':  orderBy = 'prix ASC'; break;
       case 'price-desc': orderBy = 'prix DESC'; break;
       case 'rating':     orderBy = 'note_moyenne DESC NULLS LAST'; break;
