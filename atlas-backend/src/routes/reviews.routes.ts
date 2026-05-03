@@ -82,6 +82,10 @@ router.post("/product/:id", authMiddleware, clientMiddleware, async (req: Reques
       res.status(400).json({ error: "La note doit être entre 1 et 5" });
       return;
     }
+    if (commentaire && commentaire.length > 1000) {
+      res.status(400).json({ error: "Le commentaire ne peut pas dépasser 1000 caractères" });
+      return;
+    }
     // Vérifier que le client a bien commandé ce produit ET l'a reçu (LIVRE)
     const eligibilite = await pool.query(
       `SELECT ac.id

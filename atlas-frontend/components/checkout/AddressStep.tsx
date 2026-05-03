@@ -46,9 +46,17 @@ export function AddressStep({ initial, onNext }: AddressStepProps) {
     if (!form.firstName.trim()) newErrors.firstName = "Requis";
     if (!form.lastName.trim()) newErrors.lastName = "Requis";
     if (!form.address.trim()) newErrors.address = "Requis";
-    if (!form.postalCode.trim()) newErrors.postalCode = "Requis";
+    if (!form.postalCode.trim()) {
+      newErrors.postalCode = "Requis";
+    } else if (!/^\d{5}$/.test(form.postalCode.trim())) {
+      newErrors.postalCode = "5 chiffres requis";
+    }
     if (!form.city.trim()) newErrors.city = "Requis";
-    if (!form.phone.trim()) newErrors.phone = "Requis";
+    if (!form.phone.trim()) {
+      newErrors.phone = "Requis";
+    } else if (form.phone.replace(/[\s\+\-\.]/g, "").length < 8) {
+      newErrors.phone = "Numéro trop court";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

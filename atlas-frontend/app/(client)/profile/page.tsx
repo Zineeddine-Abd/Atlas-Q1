@@ -261,6 +261,10 @@ function ProfileTab() {
   };
 
   const handleSubmit = async () => {
+    if (!form.prenom.trim() || !form.nom.trim()) {
+      setError("Le prénom et le nom sont obligatoires.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -450,8 +454,12 @@ function AddressesTab({ onCountChange }: { onCountChange: (n: number) => void })
   };
 
   const handleAdd = async () => {
-    if (!newAddr.rue.trim() || !newAddr.ville.trim()) {
-      setFormError("La rue et la ville sont obligatoires.");
+    if (!newAddr.nom.trim() || !newAddr.rue.trim() || !newAddr.ville.trim() || !newAddr.code_postal.trim()) {
+      setFormError("Le nom, la rue, la ville et le code postal sont obligatoires.");
+      return;
+    }
+    if (!/^\d{5}$/.test(newAddr.code_postal.trim())) {
+      setFormError("Le code postal doit contenir exactement 5 chiffres.");
       return;
     }
     setSaving(true);
