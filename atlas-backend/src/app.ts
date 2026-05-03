@@ -29,7 +29,7 @@ import dashboardRouter from "./routes/vendor/dashboard.routes.js";
 import reviewsRouter from "./routes/reviews.routes.js";
 import vendorOrdersRouter from "./routes/vendor/orders.routes.js";
 import boutiquesRouter from "./routes/boutiques.routes.js";
-import paymentRouter from "./routes/payment.routes.js";  // ← ADD
+import paymentRouter from "./routes/payment.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -82,7 +82,7 @@ app.use(
 app.use(express.json());
 
 // ── Routes API ────────────────────────────────────────────────────────────
-app.use("/api/payment", paymentRouter);       // ← ADD
+app.use("/api/payment", paymentRouter);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", ordersRouter);
 app.use("/api/reviews", reviewsRouter);

@@ -125,7 +125,6 @@ export function FiltersSidebar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Options étoiles avec "Toutes" pour reset
   const ratingOptions = [
     { value: 0, label: "Toutes les notes" },
     { value: 5, stars: 5, label: "5 étoiles" },

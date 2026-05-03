@@ -49,7 +49,6 @@ export async function getCart(req: Request, res: Response) {
   try {
     const userId = (req as any).user.id;
     const panierId = await getOrCreatePanier(userId);
-    console.log("Le backend cherche le panier de l'USER :", (req as any).user.id);
 
     const result = await pool.query(
       `SELECT
@@ -71,8 +70,6 @@ export async function getCart(req: Request, res: Response) {
        WHERE ap.panier_id = $1`,
       [panierId]
     );
-
-    console.log("Articles trouvés en BDD pour le panier", panierId, ":", result.rows.length);
 
     const articles = result.rows;
     const total = articles.reduce(
@@ -98,7 +95,6 @@ export async function getCart(req: Request, res: Response) {
 export async function addItem(req: Request, res: Response) {
   try {
     const userId = (req as any).user.id;
-    console.log("Connecté :", userId);
     const { variante_id, quantite = 1 } = req.body;
 
     if (!variante_id) {

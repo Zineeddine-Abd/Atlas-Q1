@@ -199,7 +199,7 @@ export async function updateOrderStatus(req: Request, res: Response) {
 
     res.status(200).json({
       message: "Statut mis à jour avec succès",
-      articles: result.rows,  // ← retourne un tableau maintenant
+      articles: result.rows,
     });
 
   } catch (error) {

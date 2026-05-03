@@ -204,7 +204,6 @@ function CatalogueContent() {
   }, [appliedFilters, currentPage]);
 
   useEffect(() => {
-    console.log("fetch déclenché, note_min:", appliedFilters.minRating);
     fetchProducts();
   }, [fetchProducts]);
 
