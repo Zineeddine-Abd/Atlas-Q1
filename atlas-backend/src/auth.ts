@@ -64,7 +64,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    sendVerificationEmail: async ({ user, url }) => {
+    sendVerificationEmail: async ({ user, url }: { user: { name: string; email: string }; url: string }) => {
       await transporter.sendMail({
         from: `"Atlas" <${process.env.GMAIL_USER}>`,
         to: user.email,
