@@ -119,7 +119,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Adresse email</label>
+          <label className={labelClass}>Adresse email <span className="text-red-500">*</span></label>
           <input
             type="email"
             value={email}
@@ -130,7 +130,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Mot de passe</label>
+          <label className={labelClass}>Mot de passe <span className="text-red-500">*</span></label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -298,23 +298,23 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
       <form onSubmit={handleRegistration} className="flex flex-col gap-4" noValidate>
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Prénom</label>
+            <label className={labelClass}>Prénom <span className="text-red-500">*</span></label>
             <input type="text" placeholder="Jean" value={firstName} onChange={(e) => setFirstName(e.target.value)} className={inputClass} />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Nom</label>
+            <label className={labelClass}>Nom <span className="text-red-500">*</span></label>
             <input type="text" placeholder="Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} className={inputClass} />
           </div>
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Adresse email</label>
+          <label className={labelClass}>Adresse email <span className="text-red-500">*</span></label>
           <input type="email" placeholder="jean.dupont@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Mot de passe</label>
+            <label className={labelClass}>Mot de passe <span className="text-red-500">*</span></label>
             <div className="relative">
               <input type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className={`${inputClass} pr-10`} />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
@@ -323,7 +323,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Confirmation</label>
+            <label className={labelClass}>Confirmation <span className="text-red-500">*</span></label>
             <div className="relative">
               <input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={`${inputClass} pr-10`} />
               <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
@@ -337,7 +337,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
           <div className="border-t border-zinc-100 pt-4 space-y-3">
             <h3 className="text-sm font-semibold text-gray-900">Informations de la boutique</h3>
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Nom de la boutique</label>
+              <label className={labelClass}>Nom de la boutique <span className="text-red-500">*</span></label>
               <input type="text" placeholder="Ex: Tech Paradise" value={shopName} onChange={(e) => setShopName(e.target.value)} className={inputClass} />
             </div>
           </div>

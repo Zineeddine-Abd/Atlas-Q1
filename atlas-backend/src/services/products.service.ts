@@ -137,7 +137,7 @@ export async function getProduitsPublicFiltres(filters: any) {
 
   let havingClause = '';
   if (filters.note_min !== undefined && filters.note_min > 0) {
-    havingClause = `HAVING ROUND(COALESCE(AVG(a.note), 0)) = $${paramIndex}`;
+    havingClause = `HAVING FLOOR(COALESCE(AVG(a.note), 0)) = $${paramIndex}`;
     values.push(Number(filters.note_min));
     paramIndex++;
   }

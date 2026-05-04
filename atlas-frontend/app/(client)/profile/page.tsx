@@ -163,6 +163,7 @@ function Field({
   placeholder,
   type = "text",
   disabled,
+  required,
 }: {
   label: string;
   name: string;
@@ -171,11 +172,12 @@ function Field({
   placeholder?: string;
   type?: string;
   disabled?: boolean;
+  required?: boolean;
 }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-        {label}
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       <input
         type={type}
@@ -340,8 +342,8 @@ function ProfileTab() {
         {error && <ErrorBanner message={error} />}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <Field label="Prénom" name="prenom" value={form.prenom} onChange={handleChange} placeholder="Votre prénom" disabled={loading} />
-          <Field label="Nom" name="nom" value={form.nom} onChange={handleChange} placeholder="Votre nom" disabled={loading} />
+          <Field label="Prénom" name="prenom" value={form.prenom} onChange={handleChange} placeholder="Votre prénom" disabled={loading} required />
+          <Field label="Nom" name="nom" value={form.nom} onChange={handleChange} placeholder="Votre nom" disabled={loading} required />
           <div className="md:col-span-2">
             <Field label="Email" name="email" type="email" value={form.email} onChange={handleChange} placeholder="votre@email.fr" disabled={true} />
             <p className="text-xs text-gray-400 mt-1">L&apos;adresse email ne peut pas être modifiée.</p>
@@ -389,6 +391,9 @@ const FORM_LABELS: Record<keyof typeof EMPTY_FORM, string> = {
   code_postal: "Code postal",
   pays: "Pays",
 };
+
+/** Champs obligatoires dans le formulaire d'adresse. */
+const REQUIRED_ADDR_FIELDS = new Set<keyof typeof EMPTY_FORM>(["nom", "rue", "ville", "code_postal"]);
 
 /**
  * Onglet "Mes adresses" de la page Mon compte.
@@ -504,7 +509,7 @@ function AddressesTab({ onCountChange }: { onCountChange: (n: number) => void })
             {(Object.keys(EMPTY_FORM) as (keyof typeof EMPTY_FORM)[]).map((key) => (
               <div key={key} className={key === "rue" ? "md:col-span-2" : ""}>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                  {FORM_LABELS[key]}
+                  {FORM_LABELS[key]}{REQUIRED_ADDR_FIELDS.has(key) && <span className="text-red-500 ml-0.5">*</span>}
                 </label>
                 <input
                   value={newAddr[key]}

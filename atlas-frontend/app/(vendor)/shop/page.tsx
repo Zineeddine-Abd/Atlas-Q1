@@ -211,8 +211,13 @@ export default function SellerStorePage() {
       setErrorMsg("La description est obligatoire.");
       return;
     }
-    if (!iban.trim()) {
+    const normalizedIban = iban.trim().replace(/[\s-]/g, "").toUpperCase();
+    if (!normalizedIban) {
       setErrorMsg("L'IBAN est obligatoire.");
+      return;
+    }
+    if (!/^FR\d{2}\d{5}\d{5}[0-9A-Z]{11}\d{2}$/.test(normalizedIban)) {
+      setErrorMsg("L'IBAN doit être un IBAN français valide (ex : FR7630006000011234567890189).");
       return;
     }
 
@@ -225,7 +230,7 @@ export default function SellerStorePage() {
         body: JSON.stringify({
           name: shopName.trim(),
           description: description.trim(),
-          iban: iban.trim(),
+          iban: normalizedIban,
         }),
       });
 
@@ -347,7 +352,7 @@ export default function SellerStorePage() {
                     className="text-sm font-semibold"
                     style={{ color: "#0D1B3E" }}
                   >
-                    Nom de la boutique
+                    Nom de la boutique <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="shopName"
@@ -365,7 +370,7 @@ export default function SellerStorePage() {
                     className="text-sm font-semibold"
                     style={{ color: "#0D1B3E" }}
                   >
-                    Description / À propos
+                    Description / À propos <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     id="description"
@@ -387,17 +392,18 @@ export default function SellerStorePage() {
                     className="text-sm font-semibold"
                     style={{ color: "#0D1B3E" }}
                   >
-                    IBAN
+                    IBAN <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="iban"
                     value={iban}
                     onChange={(e) => setIban(e.target.value)}
+                    placeholder="FR76 3000 6000 0112 3456 7890 189"
                     className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm"
                     style={{ color: "#0D1B3E" }}
                   />
                   <p className="text-xs" style={{ color: "#6F727B" }}>
-                    Votre IBAN pour recevoir les paiements
+                    IBAN français (FR + 25 caractères) pour recevoir les paiements
                   </p>
                 </div>
 

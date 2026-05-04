@@ -34,16 +34,27 @@ export interface Product {
  * @param rating - Note entre 0 et 5.
  */
 function StarRating({ rating }: { rating: number }) {
+  const validRating = Number(rating) || 0;
   return (
     <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className="h-3.5 w-3.5"
-          fill={star <= rating ? "#F59E0B" : "none"}
-          stroke={star <= rating ? "#F59E0B" : "#D1D5DB"}
-        />
-      ))}
+      {[1, 2, 3, 4, 5].map((star) => {
+        const i = star - 1;
+        const pleine = i < Math.floor(validRating);
+        const demie = !pleine && i < validRating;
+        return (
+          <span key={star} className="relative inline-block w-3.5 h-3.5">
+            <Star className="w-3.5 h-3.5 absolute inset-0" fill="#D1D5DB" stroke="#D1D5DB" />
+            {(pleine || demie) && (
+              <span
+                className="absolute inset-0 overflow-hidden"
+                style={{ width: pleine ? "100%" : "50%" }}
+              >
+                <Star className="w-3.5 h-3.5" fill="#F59E0B" stroke="#F59E0B" />
+              </span>
+            )}
+          </span>
+        );
+      })}
     </div>
   );
 }

@@ -396,7 +396,7 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
 
           {/* Nom */}
           <div className="space-y-2">
-            <label className="text-[15px] font-medium text-gray-700">Nom du produit</label>
+            <label className="text-[15px] font-medium text-gray-700">Nom du produit <span className="text-red-500">*</span></label>
             <input
               type="text"
               placeholder="Ex: Écouteurs Sans Fil"
@@ -421,7 +421,7 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
           {/* Prix */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[15px] font-medium text-gray-700">Prix de base (€)</label>
+              <label className="text-[15px] font-medium text-gray-700">Prix de base (€) <span className="text-red-500">*</span></label>
               <input
                 type="text" placeholder="0.00" value={form.prix}
                 onChange={(e) => handleChange("prix", e.target.value)}
@@ -440,7 +440,7 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
 
           {/* Catégorie */}
           <div className="space-y-2">
-            <label className="text-[15px] font-medium text-gray-700">Catégorie</label>
+            <label className="text-[15px] font-medium text-gray-700">Catégorie <span className="text-red-500">*</span></label>
             <select
               value={form.categorie_id}
               onChange={(e) => handleChange("categorie_id", e.target.value)}
@@ -456,7 +456,7 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
 
           {/* Images */}
           <div className="space-y-2">
-            <label className="text-[15px] font-medium text-gray-700">Images</label>
+            <label className="text-[15px] font-medium text-gray-700">Images <span className="text-red-500">*</span></label>
             {form.images.length > 0 && (
               <div className="flex gap-2 flex-wrap mb-2">
                 {form.images.map((url, i) => (

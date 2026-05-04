@@ -192,7 +192,7 @@ function RegisterFormContent() {
           <form onSubmit={handleRegistration} className="flex flex-col gap-5" noValidate>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-2">
-                <label className={labelClass}>Prénom</label>
+                <label className={labelClass}>Prénom <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   placeholder="Jean"
@@ -202,7 +202,7 @@ function RegisterFormContent() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className={labelClass}>Nom</label>
+                <label className={labelClass}>Nom <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   placeholder="Dupont"
@@ -214,7 +214,7 @@ function RegisterFormContent() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className={labelClass}>Adresse email</label>
+              <label className={labelClass}>Adresse email <span className="text-red-500">*</span></label>
               <input
                 type="email"
                 placeholder="jean.dupont@example.com"
@@ -226,7 +226,7 @@ function RegisterFormContent() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-2">
-                <label className={labelClass}>Mot de passe</label>
+                <label className={labelClass}>Mot de passe <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -246,7 +246,7 @@ function RegisterFormContent() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className={labelClass}>Confirmation</label>
+                <label className={labelClass}>Confirmation <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
@@ -272,7 +272,7 @@ function RegisterFormContent() {
                   Informations de la boutique
                 </h3>
                 <div className="flex flex-col gap-2">
-                  <label className={labelClass}>Nom de la boutique</label>
+                  <label className={labelClass}>Nom de la boutique <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     placeholder="Ex: Tech Paradise"

@@ -97,7 +97,7 @@ export default function LoginPage() {
 
             {/* Champ Email */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-zinc-900">Adresse email</label>
+              <label className="text-sm font-semibold text-zinc-900">Adresse email <span className="text-red-500">*</span></label>
               <input
                 type="email"
                 value={email}
@@ -108,7 +108,7 @@ export default function LoginPage() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-zinc-900">Mot de passe</label>
+              <label className="text-sm font-semibold text-zinc-900">Mot de passe <span className="text-red-500">*</span></label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}

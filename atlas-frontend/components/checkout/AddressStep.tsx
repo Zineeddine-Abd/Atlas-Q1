@@ -78,7 +78,7 @@ export function AddressStep({ initial, onNext }: AddressStepProps) {
 
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Prénom" error={errors.firstName}>
+          <Field label="Prénom" error={errors.firstName} required>
             <Input
               placeholder="Jean"
               value={form.firstName}
@@ -86,7 +86,7 @@ export function AddressStep({ initial, onNext }: AddressStepProps) {
               className={errors.firstName ? "border-red-400" : ""}
             />
           </Field>
-          <Field label="Nom" error={errors.lastName}>
+          <Field label="Nom" error={errors.lastName} required>
             <Input
               placeholder="Dupont"
               value={form.lastName}
@@ -96,7 +96,7 @@ export function AddressStep({ initial, onNext }: AddressStepProps) {
           </Field>
         </div>
 
-        <Field label="Adresse" error={errors.address}>
+        <Field label="Adresse" error={errors.address} required>
           <Input
             placeholder="123 Rue de la Paix"
             value={form.address}
@@ -106,7 +106,7 @@ export function AddressStep({ initial, onNext }: AddressStepProps) {
         </Field>
 
         <div className="grid grid-cols-3 gap-4">
-          <Field label="Code postal" error={errors.postalCode}>
+          <Field label="Code postal" error={errors.postalCode} required>
             <Input
               placeholder="75001"
               value={form.postalCode}
@@ -115,7 +115,7 @@ export function AddressStep({ initial, onNext }: AddressStepProps) {
             />
           </Field>
           <div className="col-span-2">
-            <Field label="Ville" error={errors.city}>
+            <Field label="Ville" error={errors.city} required>
               <Input
                 placeholder="Paris"
                 value={form.city}
@@ -126,7 +126,7 @@ export function AddressStep({ initial, onNext }: AddressStepProps) {
           </div>
         </div>
 
-        <Field label="Téléphone" error={errors.phone}>
+        <Field label="Téléphone" error={errors.phone} required>
           <Input
             type="tel"
             placeholder="+33 6 12 34 56 78"
@@ -158,14 +158,16 @@ function Field({
   label,
   error,
   children,
+  required,
 }: {
   label: string;
   error?: string;
   children: React.ReactNode;
+  required?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
-      <Label>{label}</Label>
+      <Label>{label}{required && <span className="text-red-500 ml-0.5">*</span>}</Label>
       {children}
       {error && <p className="text-xs text-red-500">{error}</p>}
     </div>

@@ -763,7 +763,7 @@ export default function FicheProduitPage({ params }: { params: Promise<{ id: str
                       if (!monAvis) {
                         return (
                           <div className="space-y-4">
-                            <h3 className="font-semibold text-[#1e293b] mb-2">Laisser un avis</h3>
+                            <h3 className="font-semibold text-[#1e293b] mb-2">Laissez un avis</h3>
                             <div className="flex items-center gap-2">
                               <span className="text-sm text-gray-600">Votre note :</span>
                               <div className="flex gap-1">
