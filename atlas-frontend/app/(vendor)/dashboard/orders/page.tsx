@@ -298,12 +298,12 @@ export default function VendorOrdersPage() {
                         const cmdConfig = cmdStatut ? commandeStatutConfig[cmdStatut] : null;
                         return cmdConfig ? (
                           <span className={`px-2.5 py-1 rounded-full text-xs font-medium border border-current/10 ${cmdConfig.badge}`}>
-                            Commande : {cmdConfig.label}
+                            Commande globale : {cmdConfig.label}
                           </span>
                         ) : null;
                       })()}
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.badge}`}>
-                        {config.label}
+                        Sous-commande : {config.label}
                       </span>
                     </div>
                   </div>
