@@ -228,7 +228,7 @@ export default function CheckoutPage() {
 
 
       <main className="flex-1 container mx-auto px-4 py-10 max-w-5xl">
-        <h1 className="text-2xl font-black text-slate-900 mb-8 italic">
+        <h1 className="text-2xl font-black text-slate-900 mb-8">
           Finaliser la commande
         </h1>
 
