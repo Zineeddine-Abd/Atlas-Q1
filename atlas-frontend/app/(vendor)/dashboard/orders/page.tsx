@@ -37,6 +37,17 @@ const statutConfig: Record<string, { label: string; badge: string }> = {
   REMBOURSE:      { label: 'Remboursé',       badge: 'bg-gray-100 text-gray-600'     },
 };
 
+/** Statut global de la commande (table commandes) */
+const commandeStatutConfig: Record<string, { label: string; badge: string }> = {
+  EN_ATTENTE_PAIEMENT:      { label: 'En attente de paiement', badge: 'bg-gray-100 text-gray-500'      },
+  PAYEE:                    { label: 'Payée',                  badge: 'bg-emerald-100 text-emerald-700' },
+  EXPEDIEE:                 { label: 'Expédiée',               badge: 'bg-blue-100 text-blue-700'       },
+  PARTIELLEMENT_EXPEDIEE:   { label: 'Partiellement expédiée', badge: 'bg-sky-100 text-sky-700'         },
+  TERMINEE:                 { label: 'Terminée',               badge: 'bg-green-100 text-green-700'     },
+  ANNULEE:                  { label: 'Annulée',                badge: 'bg-red-100 text-red-600'         },
+  REMBOURSEE:               { label: 'Remboursée',             badge: 'bg-gray-100 text-gray-500'       },
+};
+
 function StatusModal({
   article, onClose, onConfirm, isLoading,
 }: {
@@ -281,7 +292,16 @@ export default function VendorOrdersPage() {
                         Client : {commande?.user?.name}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      {(() => {
+                        const cmdStatut = commande?.statut;
+                        const cmdConfig = cmdStatut ? commandeStatutConfig[cmdStatut] : null;
+                        return cmdConfig ? (
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium border border-current/10 ${cmdConfig.badge}`}>
+                            Commande : {cmdConfig.label}
+                          </span>
+                        ) : null;
+                      })()}
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.badge}`}>
                         {config.label}
                       </span>
