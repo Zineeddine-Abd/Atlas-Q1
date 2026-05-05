@@ -1,76 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-const CATEGORY_STYLES: Record<string, { icon: React.ReactNode; gradient: string }> = {
-  "Électronique": {
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.8}>
-        <rect x="2" y="3" width="20" height="14" rx="2" />
-        <path d="M8 21h8M12 17v4" strokeLinecap="round" />
-      </svg>
-    ),
-    gradient: "from-[#3b6bff] to-[#7b4fff]",
-  },
-  "Mode & Vêtements": {
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-      </svg>
-    ),
-    gradient: "from-[#7b4fff] to-[#c026d3]",
-  },
-  "Maison & Décoration": {
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21H3V9.75z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 21V12h6v9" />
-      </svg>
-    ),
-    gradient: "from-[#0ea5e9] to-[#3b6bff]",
-  },
-  "Beauté & Bien-être": {
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21C12 21 4 14 4 8.5a8 8 0 0116 0C20 14 12 21 12 21z" />
-      </svg>
-    ),
-    gradient: "from-[#f472b6] to-[#7b4fff]",
-  },
-  "Sport & Loisirs": {
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.8}>
-        <circle cx="12" cy="12" r="9" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c0 0 3 4.5 3 9s-3 9-3 9M12 3c0 0-3 4.5-3 9s3 9 3 9M3 12h18" />
-      </svg>
-    ),
-    gradient: "from-[#3b6bff] to-[#0ea5e9]",
-  },
-  "Alimentation & Épicerie": {
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 2C8 2 4 6 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4-4-8-8-8z" />
-        <circle cx="12" cy="10" r="3" />
-      </svg>
-    ),
-    gradient: "from-[#22c55e] to-[#0ea5e9]",
-  },
-  "default": {
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
-    gradient: "from-[#3b6bff] to-[#7b4fff]",
-  },
-};
-
-/** Catégorie de produit récupérée depuis l'API `/api/categories`. */
-interface CategoryFromDB {
-  id: number;
-  nom: string;
-  count: number;
-}
+import {
+  ShoppingBasket, PawPrint, Palette, Car, Sparkles, Baby,
+  Gem, Footprints, Cpu, Monitor, Shovel, Gamepad2,
+  BookOpen, Home, Shirt, Music, HeartPulse, Globe,
+  Smartphone, Luggage, Zap,
+} from "lucide-react";
 
 /**
  * Section "Explorez par catégorie" de la page d'accueil.
@@ -84,6 +20,37 @@ interface CategoryFromDB {
  *
  * @returns La grille de catégories, ou `null` pendant le chargement.
  */
+
+const CATEGORY_STYLES: Record<string, { icon: React.ReactNode; gradient: string }> = {
+  "Alimentation & Épicerie":      { icon: <ShoppingBasket size={24} color="white" strokeWidth={1.8} />, gradient: "from-[#22c55e] to-[#0ea5e9]" },
+  "Animaux":                       { icon: <PawPrint size={24} color="white" strokeWidth={1.8} />,       gradient: "from-[#f59e0b] to-[#ef4444]" },
+  "Art & Artisanat":               { icon: <Palette size={24} color="white" strokeWidth={1.8} />,        gradient: "from-[#ec4899] to-[#f97316]" },
+  "Auto & Moto":                   { icon: <Car size={24} color="white" strokeWidth={1.8} />,            gradient: "from-[#64748b] to-[#3b6bff]" },
+  "Beauté & Bien-être":            { icon: <Sparkles size={24} color="white" strokeWidth={1.8} />,       gradient: "from-[#f472b6] to-[#7b4fff]" },
+  "Bébé & Puériculture":           { icon: <Baby size={24} color="white" strokeWidth={1.8} />,           gradient: "from-[#fbbf24] to-[#f472b6]" },
+  "Bijoux & Accessoires":          { icon: <Gem size={24} color="white" strokeWidth={1.8} />,            gradient: "from-[#a78bfa] to-[#ec4899]" },
+  "Chaussures":                    { icon: <Footprints size={24} color="white" strokeWidth={1.8} />,     gradient: "from-[#f97316] to-[#ef4444]" },
+  "Électronique & High-Tech":      { icon: <Cpu size={24} color="white" strokeWidth={1.8} />,            gradient: "from-[#3b6bff] to-[#7b4fff]" },
+  "Informatique & Bureautique":    { icon: <Monitor size={24} color="white" strokeWidth={1.8} />,        gradient: "from-[#0ea5e9] to-[#3b6bff]" },
+  "Jardin & Bricolage":            { icon: <Shovel size={24} color="white" strokeWidth={1.8} />,         gradient: "from-[#16a34a] to-[#65a30d]" },
+  "Jeux & Jouets":                 { icon: <Gamepad2 size={24} color="white" strokeWidth={1.8} />,       gradient: "from-[#7b4fff] to-[#3b6bff]" },
+  "Livres & Papeterie":            { icon: <BookOpen size={24} color="white" strokeWidth={1.8} />,       gradient: "from-[#0891b2] to-[#0ea5e9]" },
+  "Maison & Décoration":           { icon: <Home size={24} color="white" strokeWidth={1.8} />,           gradient: "from-[#0ea5e9] to-[#3b6bff]" },
+  "Mode & Vêtements":              { icon: <Shirt size={24} color="white" strokeWidth={1.8} />,          gradient: "from-[#7b4fff] to-[#c026d3]" },
+  "Musique & Instruments":         { icon: <Music size={24} color="white" strokeWidth={1.8} />,          gradient: "from-[#f43f5e] to-[#7b4fff]" },
+  "Santé & Pharmacie":             { icon: <HeartPulse size={24} color="white" strokeWidth={1.8} />,     gradient: "from-[#ef4444] to-[#f97316]" },
+  "Sport & Loisirs":               { icon: <Globe size={24} color="white" strokeWidth={1.8} />,          gradient: "from-[#3b6bff] to-[#0ea5e9]" },
+  "Téléphones & Accessoires":      { icon: <Smartphone size={24} color="white" strokeWidth={1.8} />,     gradient: "from-[#6366f1] to-[#3b6bff]" },
+  "Voyage & Bagages":              { icon: <Luggage size={24} color="white" strokeWidth={1.8} />,        gradient: "from-[#0ea5e9] to-[#22c55e]" },
+  "default":                       { icon: <Zap size={24} color="white" strokeWidth={1.8} />,            gradient: "from-[#3b6bff] to-[#7b4fff]" },
+};
+
+interface CategoryFromDB {
+  id: number;
+  nom: string;
+  count: number;
+}
+
 export default function Categories() {
   const [categories, setCategories] = useState<CategoryFromDB[]>([]);
   const [loading, setLoading] = useState(true);
