@@ -421,7 +421,7 @@ export default function SellerDashboardPage() {
                 {stockAlerts.map((alert) => (
                   <div
                     key={alert.produitId}
-                    className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100/70 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100/70 transition-colors"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-sm text-[#0D1B3E] truncate mb-1.5">
@@ -432,7 +432,7 @@ export default function SellerDashboardPage() {
                           const badge = getStockBadge(v.stock, v.seuil);
                           return (
                             <div key={v.varianteId} className="flex items-center gap-1 text-xs text-[#6F727B]">
-                              <span className="truncate max-w-[80px]">{v.label}</span>
+                              <span>{v.label}</span>
                               <Badge className={`${badge.className} text-xs px-1.5 py-0`}>{badge.label}</Badge>
                             </div>
                           );
@@ -440,7 +440,7 @@ export default function SellerDashboardPage() {
                       </div>
                     </div>
                     <button
-                      className="flex-shrink-0 text-xs font-medium text-[#4F46E5] hover:text-white border border-[#4F46E5]/30 hover:bg-[#4F46E5] hover:border-[#4F46E5] px-3 py-1.5 rounded-lg transition-all"
+                      className="self-start sm:self-center flex-shrink-0 text-xs font-medium text-[#4F46E5] hover:text-white border border-[#4F46E5]/30 hover:bg-[#4F46E5] hover:border-[#4F46E5] px-3 py-1.5 rounded-lg transition-all"
                       onClick={() => openReapproModal(alert)}
                     >
                       Réapprovisionner
