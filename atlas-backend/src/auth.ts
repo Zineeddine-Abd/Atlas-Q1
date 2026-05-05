@@ -11,20 +11,16 @@
  * - `BETTER_AUTH_URL`     : URL de base du backend (ex: http://localhost:3005)
  * - `FRONTEND_URL`        : URL du frontend pour CORS/trustedOrigins
  * - `NODE_ENV`            : "production" active les cookies Secure + SameSite=None
- * - `RESEND_API_KEY`      : clé API Resend pour l'envoi des emails de vérification
  *
  * Durée de session : 7 jours, renouvelée automatiquement après 24 h d'inactivité.
  */
 import { betterAuth } from "better-auth";
 import { Kysely, PostgresDialect } from "kysely";
 import pkg from "pg";
-import { Resend } from "resend";
 import dotenv from "dotenv";
 
 const { Pool } = pkg;
 dotenv.config();
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const dbPool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -58,24 +54,7 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
-    sendVerificationEmail: async ({ user, url }: { user: { name: string; email: string }; url: string }) => {
-      await resend.emails.send({
-        from: "Atlas <onboarding@resend.dev>",
-        to: user.email,
-        subject: "Vérifiez votre adresse email — Atlas",
-        html: `
-          <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px;border:1px solid #e5e7eb;">
-            <h2 style="color:#0D1B3E;margin-bottom:8px;">Bienvenue sur Atlas !</h2>
-            <p style="color:#4b5563;margin-bottom:24px;">Bonjour <strong>${user.name}</strong>,<br>Cliquez sur le bouton ci-dessous pour activer votre compte.</p>
-            <a href="${url}" style="display:inline-block;background:#4F46E5;color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:15px;">
-              Vérifier mon adresse email
-            </a>
-            <p style="color:#9ca3af;font-size:12px;margin-top:28px;">Ce lien expire dans 24h. Si vous n'avez pas créé de compte Atlas, ignorez cet email.</p>
-          </div>
-        `,
-      });
-    },
+    requireEmailVerification: false,
   },
   user: {
     additionalFields: {
