@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SellerSidebar } from './SellerSidebar';
 import {
-  TrendingUp,
-  TrendingDown,
   Package,
   ShoppingBag,
   BarChart3,
@@ -328,18 +326,8 @@ export default function SellerDashboardPage() {
               { label: 'Note moyenne',        data: kpiData.averageRating,  icon: Star        },
             ].map((kpi, i) => (
               <Card key={i} className="p-4 md:p-6 bg-white border border-gray-200 shadow-sm">
-                <div className="flex items-start justify-between mb-3 md:mb-4">
-                  <div className="p-2 md:p-3 rounded-lg bg-[#4F46E5]/10">
-                    <kpi.icon className="h-4 w-4 md:h-6 md:w-6 text-[#4F46E5]" />
-                  </div>
-                  <div className="flex items-center gap-1 text-xs md:text-sm">
-                    {kpi.data.isPositive
-                      ? <TrendingUp   className="h-3 w-3 md:h-4 md:w-4 text-green-600" />
-                      : <TrendingDown className="h-3 w-3 md:h-4 md:w-4 text-red-600"   />}
-                    <span className={kpi.data.isPositive ? 'text-green-600' : 'text-red-600'}>
-                      {kpi.data.trend}
-                    </span>
-                  </div>
+                <div className="p-2 md:p-3 rounded-lg bg-[#4F46E5]/10 w-fit mb-3 md:mb-4">
+                  <kpi.icon className="h-4 w-4 md:h-6 md:w-6 text-[#4F46E5]" />
                 </div>
                 <div className="text-xl md:text-3xl font-bold mb-1 text-[#0D1B3E]">
                   {kpi.data.value}
@@ -433,28 +421,26 @@ export default function SellerDashboardPage() {
                 {stockAlerts.map((alert) => (
                   <div
                     key={alert.produitId}
-                    className="p-3 md:p-4 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100/60 transition-colors"
+                    className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100/70 transition-colors"
                   >
-                    {/* Nom produit + variantes en ligne compacte */}
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="font-medium text-xs md:text-sm text-[#0D1B3E]">{alert.productName}</span>
-                      <span className="text-xs text-[#6F727B] flex-shrink-0">
-                        {alert.variantes.length} variante{alert.variantes.length > 1 ? 's' : ''}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {alert.variantes.map((v) => {
-                        const badge = getStockBadge(v.stock, v.seuil);
-                        return (
-                          <div key={v.varianteId} className="flex items-center gap-1.5 text-xs text-[#6F727B]">
-                            <span className="truncate max-w-[80px]">{v.label}</span>
-                            <Badge className={`${badge.className} text-xs px-1.5 py-0`}>{badge.label}</Badge>
-                          </div>
-                        );
-                      })}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-sm text-[#0D1B3E] truncate mb-1.5">
+                        {alert.productName}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {alert.variantes.map((v) => {
+                          const badge = getStockBadge(v.stock, v.seuil);
+                          return (
+                            <div key={v.varianteId} className="flex items-center gap-1 text-xs text-[#6F727B]">
+                              <span className="truncate max-w-[80px]">{v.label}</span>
+                              <Badge className={`${badge.className} text-xs px-1.5 py-0`}>{badge.label}</Badge>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                     <button
-                      className="w-full text-xs font-medium text-[#4F46E5] hover:text-[#4338ca] border border-[#4F46E5]/30 hover:border-[#4F46E5]/60 hover:bg-indigo-50/50 py-1.5 rounded-lg transition-colors"
+                      className="flex-shrink-0 text-xs font-medium text-[#4F46E5] hover:text-white border border-[#4F46E5]/30 hover:bg-[#4F46E5] hover:border-[#4F46E5] px-3 py-1.5 rounded-lg transition-all"
                       onClick={() => openReapproModal(alert)}
                     >
                       Réapprovisionner
