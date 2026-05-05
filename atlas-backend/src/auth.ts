@@ -11,25 +11,20 @@
  * - `BETTER_AUTH_URL`     : URL de base du backend (ex: http://localhost:3005)
  * - `FRONTEND_URL`        : URL du frontend pour CORS/trustedOrigins
  * - `NODE_ENV`            : "production" active les cookies Secure + SameSite=None
+ * - `RESEND_API_KEY`      : clé API Resend pour l'envoi des emails de vérification
  *
  * Durée de session : 7 jours, renouvelée automatiquement après 24 h d'inactivité.
  */
 import { betterAuth } from "better-auth";
 import { Kysely, PostgresDialect } from "kysely";
 import pkg from "pg";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import dotenv from "dotenv";
 
 const { Pool } = pkg;
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const dbPool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -65,8 +60,8 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     sendVerificationEmail: async ({ user, url }: { user: { name: string; email: string }; url: string }) => {
-      await transporter.sendMail({
-        from: `"Atlas" <${process.env.GMAIL_USER}>`,
+      await resend.emails.send({
+        from: "Atlas <onboarding@resend.dev>",
         to: user.email,
         subject: "Vérifiez votre adresse email — Atlas",
         html: `
