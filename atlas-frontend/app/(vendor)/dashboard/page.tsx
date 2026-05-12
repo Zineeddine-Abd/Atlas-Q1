@@ -107,8 +107,8 @@ const getStatusLabel = (status: string): string => {
   switch (status) {
     case 'EN_ATTENTE':     return 'En attente';
     case 'EN_PREPARATION': return 'En préparation';
-    case 'EXPEDIE':        return 'Expédié';
-    case 'LIVRE':          return 'Livré';
+    case 'EXPEDIE':        return 'Expédiée';
+    case 'LIVRE':          return 'Livrée';
     case 'ANNULEE':        return 'Annulée';
     case 'PAYEE':          return 'Payée';
     default:               return status;

@@ -31,22 +31,12 @@ const STATUTS = ['EN_ATTENTE', 'EN_PREPARATION', 'EXPEDIE', 'LIVRE', 'RETOURNE']
 const statutConfig: Record<string, { label: string; badge: string }> = {
   EN_ATTENTE:     { label: 'En attente',      badge: 'bg-yellow-100 text-yellow-800' },
   EN_PREPARATION: { label: 'En préparation',  badge: 'bg-orange-100 text-orange-800' },
-  EXPEDIE:        { label: 'Expédié',         badge: 'bg-blue-100 text-blue-800'     },
-  LIVRE:          { label: 'Livré',           badge: 'bg-green-100 text-green-800'   },
-  RETOURNE:       { label: 'Retourné',        badge: 'bg-red-100 text-red-800'       },
-  REMBOURSE:      { label: 'Remboursé',       badge: 'bg-gray-100 text-gray-600'     },
+  EXPEDIE:        { label: 'Expédiée',        badge: 'bg-blue-100 text-blue-800'     },
+  LIVRE:          { label: 'Livrée',          badge: 'bg-green-100 text-green-800'   },
+  RETOURNE:       { label: 'Retournée',       badge: 'bg-red-100 text-red-800'       },
+  REMBOURSE:      { label: 'Remboursée',      badge: 'bg-gray-100 text-gray-600'     },
 };
 
-/** Statut global de la commande (table commandes) */
-const commandeStatutConfig: Record<string, { label: string; badge: string }> = {
-  EN_ATTENTE_PAIEMENT:      { label: 'En attente de paiement', badge: 'bg-gray-100 text-gray-500'      },
-  PAYEE:                    { label: 'Payée',                  badge: 'bg-emerald-100 text-emerald-700' },
-  EXPEDIEE:                 { label: 'Expédiée',               badge: 'bg-blue-100 text-blue-700'       },
-  PARTIELLEMENT_EXPEDIEE:   { label: 'Partiellement expédiée', badge: 'bg-sky-100 text-sky-700'         },
-  TERMINEE:                 { label: 'Terminée',               badge: 'bg-green-100 text-green-700'     },
-  ANNULEE:                  { label: 'Annulée',                badge: 'bg-red-100 text-red-600'         },
-  REMBOURSEE:               { label: 'Remboursée',             badge: 'bg-gray-100 text-gray-500'       },
-};
 
 function StatusModal({
   article, onClose, onConfirm, isLoading,
@@ -293,17 +283,8 @@ export default function VendorOrdersPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap justify-end">
-                      {(() => {
-                        const cmdStatut = commande?.statut;
-                        const cmdConfig = cmdStatut ? commandeStatutConfig[cmdStatut] : null;
-                        return cmdConfig ? (
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium border border-current/10 ${cmdConfig.badge}`}>
-                            Commande globale : {cmdConfig.label}
-                          </span>
-                        ) : null;
-                      })()}
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.badge}`}>
-                        Sous-commande : {config.label}
+                        {config.label}
                       </span>
                     </div>
                   </div>

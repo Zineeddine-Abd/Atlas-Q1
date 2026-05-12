@@ -67,10 +67,10 @@ const STATUT_CONFIG: Record<string, { label: string; dot: string; text: string; 
 
   // Articles
   EN_ATTENTE: { label: "En attente", dot: "bg-amber-500", text: "text-amber-600", bg: "bg-transparent" },
-  EXPEDIE: { label: "Expédié", dot: "bg-cyan-500", text: "text-cyan-600", bg: "bg-transparent" },
-  LIVRE: { label: "Livré", dot: "bg-green-500", text: "text-green-600", bg: "bg-transparent" },
-  RETOURNE: { label: "Retourné", dot: "bg-red-500", text: "text-red-600", bg: "bg-transparent" },
-  REMBOURSE: { label: "Remboursé", dot: "bg-slate-500", text: "text-slate-600", bg: "bg-transparent" },
+  EXPEDIE: { label: "Expédiée", dot: "bg-cyan-500", text: "text-cyan-600", bg: "bg-transparent" },
+  LIVRE: { label: "Livrée", dot: "bg-green-500", text: "text-green-600", bg: "bg-transparent" },
+  RETOURNE: { label: "Retournée", dot: "bg-red-500", text: "text-red-600", bg: "bg-transparent" },
+  REMBOURSE: { label: "Remboursée", dot: "bg-slate-500", text: "text-slate-600", bg: "bg-transparent" },
 };
 
 /**
