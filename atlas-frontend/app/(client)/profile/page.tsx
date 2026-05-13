@@ -67,6 +67,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     const err = await res.json().catch(() => ({}));
     throw new Error((err as { message?: string }).message ?? `Erreur ${res.status}`);
   }
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
 
@@ -224,8 +225,13 @@ function ProfileTab() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    apiFetch<{ url_avatar?: string }>("/api/profile/me")
-      .then((data) => { if (data.url_avatar) setAvatarUrl(data.url_avatar); })
+    apiFetch<{ url_avatar?: string; numero_telephone?: string }>("/api/profile/me")
+      .then((data) => { 
+        if (data.url_avatar) setAvatarUrl(data.url_avatar); 
+        if (data.numero_telephone) {
+          setForm((prev) => ({ ...prev, telephone: data.numero_telephone || "" }));
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -265,6 +271,10 @@ function ProfileTab() {
   const handleSubmit = async () => {
     if (!form.prenom.trim() || !form.nom.trim()) {
       setError("Le prénom et le nom sont obligatoires.");
+      return;
+    }
+    if (form.telephone && !/^[\d\s+()-]+$/.test(form.telephone)) {
+      setError("Le numéro de téléphone n'est pas valide (seuls les chiffres, espaces et +()- sont autorisés).");
       return;
     }
     setLoading(true);

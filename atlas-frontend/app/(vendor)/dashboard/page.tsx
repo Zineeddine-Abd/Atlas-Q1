@@ -184,8 +184,9 @@ export default function SellerDashboardPage() {
 
   const [reapproModal,         setReapproModal]         = useState<ReapproModal | null>(null);
   const [selectedVarianteIdx,  setSelectedVarianteIdx]  = useState(0);
-  const [quantite,             setQuantite]             = useState(10);
+  const [quantite,             setQuantite]             = useState<string | number>(10);
   const [reapproLoading,       setReapproLoading]       = useState(false);
+  const [reapproError,         setReapproError]         = useState<string | null>(null);
 
   const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -240,6 +241,7 @@ export default function SellerDashboardPage() {
   const openReapproModal = (alert: StockAlert) => {
     setSelectedVarianteIdx(0);
     setQuantite(10);
+    setReapproError(null);
     setReapproModal({
       produitNom: alert.productName,
       variantes:  alert.variantes.map((v) => ({
@@ -251,6 +253,13 @@ export default function SellerDashboardPage() {
   // ── Réappro ───────────────────────────────────────────────────────────
   async function handleReappro() {
     if (!reapproModal) return;
+
+    const qStr = String(quantite);
+    if (!/^\d+$/.test(qStr) || parseInt(qStr) <= 0) {
+      setReapproError("La quantité doit être un nombre entier supérieur à 0.");
+      return;
+    }
+
     const variante = reapproModal.variantes[selectedVarianteIdx];
     setReapproLoading(true);
     try {
@@ -514,16 +523,17 @@ export default function SellerDashboardPage() {
                 ))}
               </div>
               <div className="flex items-center gap-2 mb-2">
-                <button onClick={() => setQuantite((q) => Math.max(1, q - 1))} className="w-8 h-8 rounded-lg border border-gray-200 text-lg font-medium hover:bg-gray-50">−</button>
+                <button onClick={() => { setQuantite((q) => Math.max(1, (Number(q) || 0) - 1)); setReapproError(null); }} className="w-8 h-8 rounded-lg border border-gray-200 text-lg font-medium hover:bg-gray-50">−</button>
                 <input
-                  type="number" min={1} value={quantite}
-                  onChange={(e) => setQuantite(Math.max(1, Number(e.target.value)))}
-                  className="flex-1 h-8 border border-gray-200 rounded-lg text-center text-sm font-medium"
+                  type="text" value={quantite}
+                  onChange={(e) => { setQuantite(e.target.value); setReapproError(null); }}
+                  className={`flex-1 h-8 border rounded-lg text-center text-sm font-medium ${reapproError ? "border-red-300 bg-red-50/30" : "border-gray-200"}`}
                 />
-                <button onClick={() => setQuantite((q) => q + 1)} className="w-8 h-8 rounded-lg border border-gray-200 text-lg font-medium hover:bg-gray-50">+</button>
+                <button onClick={() => { setQuantite((q) => (Number(q) || 0) + 1); setReapproError(null); }} className="w-8 h-8 rounded-lg border border-gray-200 text-lg font-medium hover:bg-gray-50">+</button>
               </div>
+              {reapproError && <p className="text-xs text-red-500 text-center mb-2">{reapproError}</p>}
               <p className="text-xs text-center text-[#6F727B] mb-4">
-                Nouveau stock : <span className="text-[#4F46E5] font-medium">{(reapproModal.variantes[selectedVarianteIdx]?.stock ?? 0) + quantite}</span>
+                Nouveau stock : <span className="text-[#4F46E5] font-medium">{(reapproModal.variantes[selectedVarianteIdx]?.stock ?? 0) + (Number(quantite) || 0)}</span>
               </p>
               <Button onClick={handleReappro} disabled={reapproLoading} className="w-full bg-[#4F46E5] text-white hover:bg-[#4338ca] mb-2">
                 {reapproLoading ? 'Enregistrement...' : 'Confirmer'}

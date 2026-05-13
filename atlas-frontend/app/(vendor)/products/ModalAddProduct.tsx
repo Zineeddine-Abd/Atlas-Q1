@@ -123,6 +123,8 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
 
   useEffect(() => {
     if (!isOpen) return;
+    setFormError(null);
+    setErreurSauvegarde(null);
     if (produitInitial) {
       setForm({
         nom: produitInitial.nom,
@@ -259,13 +261,17 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
     setFormError(null);
 
     if (!form.nom.trim()) return setFormError("Le nom du produit est obligatoire.");
-    if (!form.prix || parseFloat(form.prix) <= 0) return setFormError("Le prix de base doit être supérieur à 0.");
+    if (!form.prix) return setFormError("Le prix de base est obligatoire.");
+    if (!/^\d+(\.\d+)?$/.test(form.prix) || parseFloat(form.prix) <= 0) return setFormError("Le prix de base doit être un nombre valide supérieur à 0.");
 
     // ── Validation du prix barré ────────────────────────────────────────
     if (form.prix_compare) {
+      if (!/^\d+(\.\d+)?$/.test(form.prix_compare)) {
+        return setFormError("Le prix barré doit être un nombre valide.");
+      }
       const prixCompare = parseFloat(form.prix_compare);
       const prixBase = parseFloat(form.prix);
-      if (isNaN(prixCompare) || prixCompare <= 0) {
+      if (prixCompare <= 0) {
         return setFormError("Le prix barré doit être un nombre positif.");
       }
       if (prixCompare <= prixBase) {
@@ -307,8 +313,17 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
       const v = variantesToSubmit[i];
       if ((v as FormVariante).supprimee) continue;
 
-      if (v.stock === "" || parseInt(v.stock) < 0) {
-        return setFormError(`Le stock de la variante ${i + 1} est obligatoire et doit être ≥ 0.`);
+      if (v.stock === "") {
+        return setFormError(`Le stock de la variante ${i + 1} est obligatoire.`);
+      }
+      if (!/^\d+$/.test(v.stock)) {
+        return setFormError(`Le stock de la variante ${i + 1} doit être un entier positif valide.`);
+      }
+      if (v.prix_supplementaire && !/^\d+(\.\d+)?$/.test(v.prix_supplementaire)) {
+        return setFormError(`Le prix supplémentaire de la variante ${i + 1} doit être un nombre valide.`);
+      }
+      if (v.seuil_stock_faible && !/^\d+$/.test(v.seuil_stock_faible)) {
+        return setFormError(`Le seuil d'alerte de la variante ${i + 1} doit être un nombre entier valide.`);
       }
 
       const keys = v.attributs.map((a) => a.cle.trim().toLowerCase()).filter(Boolean);
