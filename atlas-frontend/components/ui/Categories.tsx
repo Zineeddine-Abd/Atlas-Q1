@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   ShoppingBasket, PawPrint, Palette, Car, Sparkles, Baby,
   Gem, Footprints, Cpu, Monitor, Shovel, Gamepad2,
   BookOpen, Home, Shirt, Music, HeartPulse, Globe,
-  Smartphone, Luggage, Zap,
+  Smartphone, Luggage, Zap, ChevronLeft, ChevronRight,
 } from "lucide-react";
 
 /**
@@ -54,6 +54,9 @@ interface CategoryFromDB {
 export default function Categories() {
   const [categories, setCategories] = useState<CategoryFromDB[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -69,6 +72,19 @@ export default function Categories() {
       });
   }, []);
 
+  const updateArrows = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  };
+
+  useEffect(() => { updateArrows(); }, [categories]);
+
+  const scroll = (dir: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: dir === "left" ? -320 : 320, behavior: "smooth" });
+  };
+
   const handleCategoryClick = (cat: CategoryFromDB) => {
     router.push(`/catalogue?categorie=${encodeURIComponent(cat.nom)}`);
   };
@@ -78,18 +94,44 @@ export default function Categories() {
   return (
     <section className="bg-gray-50 py-12 md:py-20 px-4 md:px-20">
       <div className="max-w-[1200px] mx-auto">
-        <div className="flex items-center gap-3 mb-10">
-          <div className="w-1 h-7 rounded-sm bg-gradient-to-b from-[#3b6bff] to-[#7b4fff]" />
-          <h2 className="font-bold text-2xl text-[#111]">Explorez par catégorie</h2>
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-7 rounded-sm bg-gradient-to-b from-[#3b6bff] to-[#7b4fff]" />
+            <h2 className="font-bold text-xl md:text-2xl text-[#111]">Explorez par catégorie</h2>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => scroll("left")}
+              disabled={!canScrollLeft}
+              className="w-9 h-9 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center transition-opacity hover:shadow-md disabled:opacity-30"
+            >
+              <ChevronLeft className="w-4 h-4 text-gray-700" />
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              disabled={!canScrollRight}
+              className="w-9 h-9 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center transition-opacity hover:shadow-md disabled:opacity-30"
+            >
+              <ChevronRight className="w-4 h-4 text-gray-700" />
+            </button>
+          </div>
         </div>
-        <div className="flex overflow-x-auto pb-4 sm:pb-0 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 no-scrollbar">
+
+        {/* Slider track */}
+        <div
+          ref={scrollRef}
+          onScroll={updateArrows}
+          className="flex gap-4 overflow-x-auto no-scrollbar pb-2"
+        >
           {categories.map((cat) => {
             const style = CATEGORY_STYLES[cat.nom] || CATEGORY_STYLES["default"];
             return (
               <button
                 key={cat.id}
                 onClick={() => handleCategoryClick(cat)}
-                className={`flex-none w-[140px] md:w-full rounded-2xl bg-gradient-to-br ${style.gradient} p-6 flex flex-col items-center gap-3 transition-all shadow-md hover:-translate-y-1 hover:shadow-xl active:scale-95 cursor-pointer`}
+                className={`flex-none w-[140px] rounded-2xl bg-gradient-to-br ${style.gradient} p-6 flex flex-col items-center gap-3 transition-all shadow-md hover:-translate-y-1 hover:shadow-xl active:scale-95 cursor-pointer`}
               >
                 <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
                   {style.icon}
@@ -106,6 +148,7 @@ export default function Categories() {
             );
           })}
         </div>
+
       </div>
     </section>
   );
