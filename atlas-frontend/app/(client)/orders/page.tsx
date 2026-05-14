@@ -30,6 +30,7 @@ interface ArticleCommande {
   numero_suivi?: string;
   transporteur?: string;
   sku: string;
+  produit_id: number;
 }
 
 /** Représente une commande complète avec ses articles, adresse de livraison et statut. */
@@ -118,17 +119,21 @@ function ArticlesSummary({ articles }: { articles: ArticleCommande[] }) {
         const statutCfg = getStatut(article.article_statut);
 
         return (
-          <div key={article.id || index} className="flex items-center gap-2.5 w-full">
+          <Link
+            key={article.id || index}
+            href={`/products/${article.produit_id}`}
+            className="flex items-center gap-2.5 w-full group"
+          >
             {img ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={img} alt={article.produit_nom} className="w-12 h-12 rounded-md object-cover border border-slate-200 shrink-0" />
+              <img src={img} alt={article.produit_nom} className="w-12 h-12 rounded-md object-cover border border-slate-200 shrink-0 group-hover:opacity-80 transition-opacity" />
             ) : (
               <div className="w-12 h-12 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
                 <Package size={20} className="text-slate-300" />
               </div>
             )}
             <div className="flex flex-col">
-              <span className="text-[13px] font-semibold text-slate-800 leading-tight">
+              <span className="text-[13px] font-semibold text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">
                 {article.produit_nom}
               </span>
               <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
@@ -141,7 +146,7 @@ function ArticlesSummary({ articles }: { articles: ArticleCommande[] }) {
                 Vendu par <span className="font-medium text-slate-500">{article.boutique_nom || "Atlas"}</span>
               </span>
             </div>
-          </div>
+          </Link>
         );
       })}
     </div>

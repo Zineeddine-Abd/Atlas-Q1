@@ -319,6 +319,7 @@ export async function getMyOrders(req: Request, res: Response) {
          ac.statut        AS article_statut,
          ac.numero_suivi,
          ac.transporteur,
+         p.id             AS produit_id,
          p.nom            AS produit_nom,
          COALESCE(p.images, '[]'::jsonb) AS images,
          vp.attributs     AS variante_attributs,
