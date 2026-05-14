@@ -104,6 +104,7 @@ function pairesToObjet(paires: AttributPaire[]): Record<string, string> {
 export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: ModalProps) {
   const [form, setForm] = useState<FormData>(FORM_VIDE);
   const [uploadEnCours, setUploadEnCours] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [erreurSauvegarde, setErreurSauvegarde] = useState<string | null>(null);
   const [erreurUpload, setErreurUpload] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -258,123 +259,129 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     setFormError(null);
 
-    if (!form.nom.trim()) return setFormError("Le nom du produit est obligatoire.");
-    if (!form.prix) return setFormError("Le prix de base est obligatoire.");
-    if (!/^\d+(\.\d+)?$/.test(form.prix) || parseFloat(form.prix) <= 0) return setFormError("Le prix de base doit être un nombre valide supérieur à 0.");
+    try {
+      if (!form.nom.trim()) return setFormError("Le nom du produit est obligatoire.");
+      if (!form.prix) return setFormError("Le prix de base est obligatoire.");
+      if (!/^\d+(\.\d+)?$/.test(form.prix) || parseFloat(form.prix) <= 0) return setFormError("Le prix de base doit être un nombre valide supérieur à 0.");
 
-    // ── Validation du prix barré ────────────────────────────────────────
-    if (form.prix_compare) {
-      if (!/^\d+(\.\d+)?$/.test(form.prix_compare)) {
-        return setFormError("Le prix barré doit être un nombre valide.");
-      }
-      const prixCompare = parseFloat(form.prix_compare);
-      const prixBase = parseFloat(form.prix);
-      if (prixCompare <= 0) {
-        return setFormError("Le prix barré doit être un nombre positif.");
-      }
-      if (prixCompare <= prixBase) {
-        return setFormError("Le prix barré doit être supérieur au prix de base (il représente l'ancien prix avant réduction).");
-      }
-    }
-
-    if (!form.categorie_id) return setFormError("Veuillez sélectionner une catégorie.");
-    if (form.images.length === 0) return setFormError("Veuillez ajouter au moins une image.");
-
-    const variantesActives = form.variantes.filter((v) => !v.supprimee);
-
-    // ── Validation du stock obligatoire ──────────────────────────────────
-    // Le stock doit être explicitement saisi pour au moins la première variante.
-    // Les attributs peuvent rester vides (variante par défaut), mais le stock est requis.
-    const hasAnyStockSet = variantesActives.some((v) => v.stock !== "");
-    if (!hasAnyStockSet) {
-      return setFormError("Le stock est obligatoire. Veuillez saisir le stock pour au moins une variante.");
-    }
-
-    // ── Construction des variantes à soumettre ───────────────────────────
-    // Si aucun attribut n'est renseigné, on crée une variante par défaut
-    // avec le stock saisi par le vendeur.
-    const hasAttributes = variantesActives.some(
-      (v) => v.attributs.some((a) => a.cle.trim() && a.valeur.trim())
-    );
-
-    const variantesToSubmit = hasAttributes
-      ? variantesActives
-      : [
-          {
-            ...variantesActives[0],
-            attributs: [] as AttributPaire[],
-          },
-        ];
-
-    const variantesFormatees = [];
-    for (let i = 0; i < variantesToSubmit.length; i++) {
-      const v = variantesToSubmit[i];
-      if ((v as FormVariante).supprimee) continue;
-
-      if (v.stock === "") {
-        return setFormError(`Le stock de la variante ${i + 1} est obligatoire.`);
-      }
-      if (!/^\d+$/.test(v.stock)) {
-        return setFormError(`Le stock de la variante ${i + 1} doit être un entier positif valide.`);
-      }
-      if (v.prix_supplementaire && !/^\d+(\.\d+)?$/.test(v.prix_supplementaire)) {
-        return setFormError(`Le prix supplémentaire de la variante ${i + 1} doit être un nombre valide.`);
-      }
-      if (v.seuil_stock_faible && !/^\d+$/.test(v.seuil_stock_faible)) {
-        return setFormError(`Le seuil d'alerte de la variante ${i + 1} doit être un nombre entier valide.`);
+      // ── Validation du prix barré ────────────────────────────────────────
+      if (form.prix_compare) {
+        if (!/^\d+(\.\d+)?$/.test(form.prix_compare)) {
+          return setFormError("Le prix barré doit être un nombre valide.");
+        }
+        const prixCompare = parseFloat(form.prix_compare);
+        const prixBase = parseFloat(form.prix);
+        if (prixCompare <= 0) {
+          return setFormError("Le prix barré doit être un nombre positif.");
+        }
+        if (prixCompare <= prixBase) {
+          return setFormError("Le prix barré doit être supérieur au prix de base (il représente l'ancien prix avant réduction).");
+        }
       }
 
-      const keys = v.attributs.map((a) => a.cle.trim().toLowerCase()).filter(Boolean);
-      const uniqueKeys = new Set(keys);
-      if (keys.length !== uniqueKeys.size) {
-        return setFormError(`La variante ${i + 1} contient des noms d'attributs en double.`);
+      if (!form.categorie_id) return setFormError("Veuillez sélectionner une catégorie.");
+      if (form.images.length === 0) return setFormError("Veuillez ajouter au moins une image.");
+
+      const variantesActives = form.variantes.filter((v) => !v.supprimee);
+
+      // ── Validation du stock obligatoire ──────────────────────────────────
+      // Le stock doit être explicitement saisi pour au moins la première variante.
+      // Les attributs peuvent rester vides (variante par défaut), mais le stock est requis.
+      const hasAnyStockSet = variantesActives.some((v) => v.stock !== "");
+      if (!hasAnyStockSet) {
+        return setFormError("Le stock est obligatoire. Veuillez saisir le stock pour au moins une variante.");
       }
 
-      variantesFormatees.push({
-        id: (v as FormVariante).id,
-        attributs: pairesToObjet(v.attributs),
-        prix_supplementaire: parseFloat(v.prix_supplementaire) || 0,
-        stock: parseInt(v.stock),
-        seuil_stock_faible: parseInt(v.seuil_stock_faible) || 5,
-      });
-    }
+      // ── Construction des variantes à soumettre ───────────────────────────
+      // Si aucun attribut n'est renseigné, on crée une variante par défaut
+      // avec le stock saisi par le vendeur.
+      const hasAttributes = variantesActives.some(
+        (v) => v.attributs.some((a) => a.cle.trim() && a.valeur.trim())
+      );
 
-    if (variantesFormatees.length === 0) {
-      return setFormError("Vous devez avoir au moins une variante.");
-    }
+      const variantesToSubmit = hasAttributes
+        ? variantesActives
+        : [
+            {
+              ...variantesActives[0],
+              attributs: [] as AttributPaire[],
+            },
+          ];
 
-    const payload = {
-      nom: form.nom,
-      description: form.description,
-      prix: parseFloat(form.prix) || 0,
-      prix_compare: form.prix_compare ? parseFloat(form.prix_compare) : null,
-      categorie_id: parseInt(form.categorie_id),
-      images: form.images,
-      actif: form.actif,
-      variantes: variantesFormatees,
-    };
+      const variantesFormatees = [];
+      for (let i = 0; i < variantesToSubmit.length; i++) {
+        const v = variantesToSubmit[i];
+        if ((v as FormVariante).supprimee) continue;
 
-    const response = await fetch(
-      produitInitial
-        ? `/api/vendor/products/${produitInitial.id}`
-        : `/api/vendor/products`,
-      {
-        method: produitInitial ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
+        if (v.stock === "") {
+          return setFormError(`Le stock de la variante ${i + 1} est obligatoire.`);
+        }
+        if (!/^\d+$/.test(v.stock)) {
+          return setFormError(`Le stock de la variante ${i + 1} doit être un entier positif valide.`);
+        }
+        if (v.prix_supplementaire && !/^\d+(\.\d+)?$/.test(v.prix_supplementaire)) {
+          return setFormError(`Le prix supplémentaire de la variante ${i + 1} doit être un nombre valide.`);
+        }
+        if (v.seuil_stock_faible && !/^\d+$/.test(v.seuil_stock_faible)) {
+          return setFormError(`Le seuil d'alerte de la variante ${i + 1} doit être un nombre entier valide.`);
+        }
+
+        const keys = v.attributs.map((a) => a.cle.trim().toLowerCase()).filter(Boolean);
+        const uniqueKeys = new Set(keys);
+        if (keys.length !== uniqueKeys.size) {
+          return setFormError(`La variante ${i + 1} contient des noms d'attributs en double.`);
+        }
+
+        variantesFormatees.push({
+          id: (v as FormVariante).id,
+          attributs: pairesToObjet(v.attributs),
+          prix_supplementaire: parseFloat(v.prix_supplementaire) || 0,
+          stock: parseInt(v.stock),
+          seuil_stock_faible: parseInt(v.seuil_stock_faible) || 5,
+        });
       }
-    );
 
-    if (response.ok) {
-      onSuccess?.();
-      onClose();
-    } else {
-      const errorData = await response.json();
-      console.error("Erreur serveur :", errorData.error);
-      setErreurSauvegarde(errorData.error || "Un champ obligatoire est manquant.");
+      if (variantesFormatees.length === 0) {
+        return setFormError("Vous devez avoir au moins une variante.");
+      }
+
+      const payload = {
+        nom: form.nom,
+        description: form.description,
+        prix: parseFloat(form.prix) || 0,
+        prix_compare: form.prix_compare ? parseFloat(form.prix_compare) : null,
+        categorie_id: parseInt(form.categorie_id),
+        images: form.images,
+        actif: form.actif,
+        variantes: variantesFormatees,
+      };
+
+      const response = await fetch(
+        produitInitial
+          ? `/api/vendor/products/${produitInitial.id}`
+          : `/api/vendor/products`,
+        {
+          method: produitInitial ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (response.ok) {
+        onSuccess?.();
+        onClose();
+      } else {
+        const errorData = await response.json();
+        console.error("Erreur serveur :", errorData.error);
+        setErreurSauvegarde(errorData.error || "Un champ obligatoire est manquant.");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -703,10 +710,10 @@ export function ModalAddProduct({ isOpen, onClose, onSuccess, produitInitial }: 
               Annuler
             </button>
             <button
-              type="button" onClick={handleSubmit} disabled={uploadEnCours}
+              type="button" onClick={handleSubmit} disabled={uploadEnCours || isSubmitting}
               className="px-8 py-3 rounded-xl bg-[#5c59f2] text-white font-bold hover:bg-[#4a47d1] shadow-lg shadow-indigo-100 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {produitInitial ? "Enregistrer" : "Créer le produit"}
+              {isSubmitting ? "Enregistrement..." : produitInitial ? "Enregistrer" : "Créer le produit"}
             </button>
           </div>
         </div>

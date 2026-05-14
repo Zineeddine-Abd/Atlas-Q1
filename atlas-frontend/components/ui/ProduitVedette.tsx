@@ -34,7 +34,7 @@ export default function ProduitVedette() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/products?limite=4')
+    fetch('/api/products?limite=4&tri=popular')
       .then((res) => res.json())
       .then((data) => {
         const mapped = (data.produits || []).map((p: any) => ({
